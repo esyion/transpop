@@ -22,8 +22,73 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  create-release:
+    name: Create draft release
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    outputs:
+      release-id: ${{ steps.create-release.outputs.result }}
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Verify release tag matches app version
+        shell: pwsh
+        run: |
+          $config = Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json
+          $expectedTag = "v$($config.version)"
+          if ($env:RELEASE_TAG -ne $expectedTag) {
+            Write-Error "Release tag '$env:RELEASE_TAG' does not match src-tauri/tauri.conf.json version '$($config.version)'. Expected tag '$expectedTag'."
+            exit 1
+          }
+
+      - name: Create clean draft release
+        id: create-release
+        uses: actions/github-script@v8
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.RELEASE_TAG;
+            const releases = await github.paginate(github.rest.repos.listReleases, {
+              owner,
+              repo,
+              per_page: 100,
+            });
+            const matching = releases.filter((release) => release.tag_name === tag);
+            const published = matching.find((release) => !release.draft);
+            if (published) {
+              core.setFailed(`Release ${tag} already exists and is published: ${published.html_url}`);
+              return '';
+            }
+            for (const draft of matching) {
+              core.info(`Deleting existing draft release ${draft.id} for ${tag}`);
+              await github.rest.repos.deleteRelease({ owner, repo, release_id: draft.id });
+            }
+            const { data: release } = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tag,
+              name: `TransPop ${tag}`,
+              body: [
+                'TransPop installer packages.',
+                '',
+                'Download the asset that matches your operating system.',
+              ].join('\n'),
+              draft: true,
+              prerelease: tag.includes('-'),
+            });
+            core.info(`Created draft release ${release.id}: ${release.html_url}`);
+            return String(release.id);
+
   publish-tauri:
     name: Build ${{ matrix.label }} installer
+    needs: create-release
     runs-on: ${{ matrix.platform }}
     permissions:
       contents: write
@@ -92,16 +157,6 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify release tag matches app version
-        shell: pwsh
-        run: |
-          $config = Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json
-          $expectedTag = "v$($config.version)"
-          if ($env:RELEASE_TAG -ne $expectedTag) {
-            Write-Error "Release tag '$env:RELEASE_TAG' does not match src-tauri/tauri.conf.json version '$($config.version)'. Expected tag '$expectedTag'."
-            exit 1
-          }
-
       - name: Build and upload installers
         uses: tauri-apps/tauri-action@v1
         env:
@@ -109,13 +164,30 @@ jobs:
           APPLE_SIGNING_IDENTITY: '-'
         with:
           tauriScript: pnpm tauri
+          releaseId: ${{ needs.create-release.outputs.release-id }}
           tagName: ${{ env.RELEASE_TAG }}
-          releaseName: TransPop ${{ env.RELEASE_TAG }}
-          releaseBody: |
-            TransPop installer packages.
-
-            Download the asset that matches your operating system. This release is created as a draft so assets can be checked before publishing.
-          releaseDraft: true
-          prerelease: ${{ contains(env.RELEASE_TAG, '-') }}
           releaseAssetNamePattern: TransPop_[version]_[platform]_[arch][setup].[ext]
           args: ${{ matrix.args }}
+
+  publish-release:
+    name: Publish GitHub Release
+    needs:
+      - create-release
+      - publish-tauri
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Publish release after all installers are uploaded
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const release_id = Number('${{ needs.create-release.outputs.release-id }}');
+            const { data: release } = await github.rest.repos.updateRelease({
+              owner,
+              repo,
+              release_id,
+              draft: false,
+            });
+            core.info(`Published ${release.html_url}`);

@@ -86,10 +86,9 @@ Release steps:
    git push origin v0.1.0
    ```
 
-4. Wait for the **Publish installers** GitHub Actions workflow to finish.
-5. Review the generated draft GitHub Release and publish it manually after confirming the uploaded installers.
+4. Wait for the **Publish installers** GitHub Actions workflow to finish. The workflow first creates a draft release, uploads all installers into that single release, and publishes it automatically only after every platform build succeeds.
 
-You can also rerun the workflow manually from GitHub Actions with an existing tag name.
+You can also rerun the workflow manually from GitHub Actions with an existing tag name, as long as that release has not already been published.
 
 ## LLM Configuration
 
