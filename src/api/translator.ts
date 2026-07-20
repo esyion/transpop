@@ -1,5 +1,5 @@
 ﻿import { invoke } from "@tauri-apps/api/core";
-import type { TranslationResult, TranslationSettings } from "../types/translation";
+import type { ApiMode, TranslationResult, TranslationSettings } from "../types/translation";
 
 export interface Translator {
   translate(text: string, settings: TranslationSettings, targetLanguage: string): Promise<TranslationResult>;
@@ -33,7 +33,9 @@ class TauriTranslator implements Translator {
         request: {
           text,
           targetLanguage,
-          provider: settings.provider,
+          apiBaseUrl: settings.apiBaseUrl,
+          apiMode: settings.apiMode,
+          model: settings.model,
         },
       });
     }
@@ -49,3 +51,4 @@ class TauriTranslator implements Translator {
 }
 
 export const translator: Translator = new TauriTranslator();
+export type { ApiMode };

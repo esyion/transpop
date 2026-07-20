@@ -142,7 +142,7 @@ function App() {
   );
   const hasApiKey =
     settings.apiKeyConfigured || settings.apiKey.trim().length > 0;
-  const apiKeyMissing = settings.provider === "OpenAI" && !hasApiKey;
+  const apiKeyMissing = !hasApiKey;
   const languageHint = useMemo(() => {
     if (!result) return `Auto → ${effectiveTargetLanguage}`;
     return `${result.sourceLanguage} → ${result.targetLanguage}`;
@@ -266,13 +266,15 @@ function App() {
 
     if (apiKeyMissing) {
       setError(null);
-      if (force) toast.info("Add your OpenAI API key to start translating.");
+      if (force) toast.info("Add an API key to start translating.");
       return;
     }
 
     const requestKey = [
       text,
-      settings.provider,
+      settings.apiBaseUrl,
+      settings.apiMode,
+      settings.model,
       effectiveTargetLanguage,
       settings.apiKeyConfigured,
       settings.apiKey,
@@ -320,7 +322,7 @@ function App() {
       if (requestId !== translateRequestIdRef.current) return;
       console.error(cause);
       const message = String(cause).includes("API key")
-        ? "Open Settings and add your OpenAI API key."
+        ? "Open Settings and add your API key."
         : "Unable to translate. Retry or check your network.";
       setError(message);
       toast.error(message);
@@ -352,7 +354,9 @@ function App() {
     settings.apiKey,
     settings.apiKeyConfigured,
     settings.autoCopy,
-    settings.provider,
+    settings.apiBaseUrl,
+    settings.apiMode,
+    settings.model,
     view,
   ]);
 
@@ -748,7 +752,7 @@ function ResultArea({
             Add API Key to start translating
           </CardTitle>
           <CardDescription>
-            Your OpenAI key is encrypted before it is stored in the local SQLite
+            Your API key is encrypted before it is stored in the local SQLite
             database.
           </CardDescription>
         </CardHeader>
@@ -880,3 +884,5 @@ function RecentHistory({
 }
 
 export default App;
+
+

@@ -1,4 +1,4 @@
-﻿export type TranslationProvider = "OpenAI";
+﻿export type ApiMode = "responses" | "chat_completions";
 export type ThemeMode = "system" | "light" | "dark";
 export type Language = "Chinese" | "English" | "Japanese" | "Korean" | "French" | "German" | "Spanish";
 export type ViewMode = "translate" | "settings";
@@ -10,7 +10,9 @@ export interface TranslationResult {
 }
 
 export interface TranslationSettings {
-  provider: TranslationProvider;
+  apiBaseUrl: string;
+  apiMode: ApiMode;
+  model: string;
   apiKey: string;
   apiKeyConfigured: boolean;
   targetLanguage: Language;

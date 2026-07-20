@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Input } from "./ui/input";
 import { Switch } from "./ui/switch";
 import { useAppStore } from "../store/appStore";
-import { LANGUAGE_OPTIONS, THEME_OPTIONS } from "../utils/constants";
-import type { Language, ThemeMode } from "../types/translation";
+import { API_MODE_OPTIONS, LANGUAGE_OPTIONS, THEME_OPTIONS } from "../utils/constants";
+import type { ApiMode, Language, ThemeMode } from "../types/translation";
 
 const navItems = ["General", "Translation", "Appearance", "Shortcut", "About"];
 
@@ -63,20 +63,48 @@ export function SettingsPanel() {
       <div className="grid max-h-[365px] gap-3 overflow-auto pr-1">
         <SettingGroup
           icon={<PlugZap size={17} />}
-          title="API"
-          description="Only OpenAI is enabled in the MVP to avoid unusable provider choices."
+          title="LLM API"
+          description="Use any OpenAI-compatible endpoint. Only Responses and Chat Completions are supported."
         >
-          <div className="flex items-center justify-between gap-3 rounded-[12px] border border-border bg-background px-3 py-2">
-            <span className="text-sm text-muted-foreground">Provider</span>
-            <Badge variant="secondary">OpenAI</Badge>
-          </div>
+          <Field label="Base URL">
+            <Input
+              value={settings.apiBaseUrl}
+              placeholder="https://api.openai.com/v1"
+              onChange={(event) => updateSettings({ apiBaseUrl: event.currentTarget.value })}
+            />
+          </Field>
+
+          <Field label="Interface">
+            <div className="grid grid-cols-2 gap-1 rounded-[12px] border border-border bg-background p-1">
+              {API_MODE_OPTIONS.map((mode) => (
+                <Button
+                  key={mode.value}
+                  type="button"
+                  size="sm"
+                  variant={settings.apiMode === mode.value ? "accent" : "ghost"}
+                  onClick={() => updateSettings({ apiMode: mode.value as ApiMode })}
+                >
+                  {settings.apiMode === mode.value ? <Check size={14} /> : null}
+                  {mode.label}
+                </Button>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Model">
+            <Input
+              value={settings.model}
+              placeholder={settings.apiMode === "responses" ? "gpt-5.4" : "qwen-plus / moonshot-v1-8k"}
+              onChange={(event) => updateSettings({ model: event.currentTarget.value })}
+            />
+          </Field>
 
           <Field label="API Key">
             <div className="flex gap-2">
               <Input
                 value={apiKeyDraft}
                 type="password"
-                placeholder={settings.apiKeyConfigured ? "Saved securely · paste a new key to replace" : "Paste OpenAI API key"}
+                placeholder={settings.apiKeyConfigured ? "Saved securely · paste a new key to replace" : "Paste API key"}
                 onChange={(event) => setApiKeyDraft(event.currentTarget.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") saveApiKey();
@@ -234,3 +262,4 @@ function SwitchRow({ label, checked, onCheckedChange }: { label: string; checked
     </label>
   );
 }
+

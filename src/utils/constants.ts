@@ -1,7 +1,9 @@
 ﻿import type { TranslationSettings } from "../types/translation";
 
 export const DEFAULT_SETTINGS: TranslationSettings = {
-  provider: "OpenAI",
+  apiBaseUrl: "https://api.openai.com/v1",
+  apiMode: "responses",
+  model: "gpt-5.4",
   apiKey: "",
   apiKeyConfigured: false,
   targetLanguage: "Chinese",
@@ -24,5 +26,9 @@ export const LANGUAGE_OPTIONS = [
   "Spanish",
 ] as const;
 
-export const PROVIDER_OPTIONS = ["OpenAI"] as const;
+export const API_MODE_OPTIONS = [
+  { value: "responses", label: "Responses" },
+  { value: "chat_completions", label: "Chat Completions" },
+] as const;
+
 export const THEME_OPTIONS = ["system", "light", "dark"] as const;

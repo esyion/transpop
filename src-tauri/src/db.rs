@@ -17,7 +17,9 @@ const KEYRING_USER: &str = "sqlite-api-key-encryption";
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
-    pub provider: String,
+    pub api_base_url: String,
+    pub api_mode: String,
+    pub model: String,
     pub target_language: String,
     pub smart_target_language: bool,
     pub shortcut: String,
@@ -46,7 +48,9 @@ pub struct HistoryItem {
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
-            provider: "OpenAI".to_string(),
+            api_base_url: "https://api.openai.com/v1".to_string(),
+            api_mode: "responses".to_string(),
+            model: "gpt-5.4".to_string(),
             target_language: "Chinese".to_string(),
             smart_target_language: true,
             shortcut: "Alt + Space".to_string(),
@@ -91,26 +95,30 @@ pub fn save_app_settings<R: Runtime>(app: AppHandle<R>, settings: AppSettings) -
         .map_err(|err| err.to_string())?;
 
     if let Some(api_key) = settings.api_key.as_deref().map(str::trim).filter(|key| !key.is_empty()) {
-        existing_secret = encrypt_secret(api_key)?.into();
+        existing_secret = encrypt_secret(api_key)?;
     }
 
     conn.execute(
         "UPDATE app_settings
-         SET provider = ?1,
-             target_language = ?2,
-             smart_target_language = ?3,
-             shortcut = ?4,
-             shortcut_enabled = ?5,
-             theme = ?6,
-             font_scale = ?7,
-             startup = ?8,
-             auto_copy = ?9,
-             api_key_ciphertext = ?10,
-             api_key_nonce = ?11,
-             updated_at = ?12
+         SET api_base_url = ?1,
+             api_mode = ?2,
+             model = ?3,
+             target_language = ?4,
+             smart_target_language = ?5,
+             shortcut = ?6,
+             shortcut_enabled = ?7,
+             theme = ?8,
+             font_scale = ?9,
+             startup = ?10,
+             auto_copy = ?11,
+             api_key_ciphertext = ?12,
+             api_key_nonce = ?13,
+             updated_at = ?14
          WHERE id = 1",
         params![
-            "OpenAI",
+            normalize_base_url(&settings.api_base_url),
+            normalize_api_mode(&settings.api_mode),
+            normalize_model(&settings.model),
             settings.target_language,
             bool_to_i64(settings.smart_target_language),
             settings.shortcut,
@@ -202,7 +210,9 @@ fn migrate(conn: &Connection) -> Result<(), String> {
         "PRAGMA foreign_keys = ON;
          CREATE TABLE IF NOT EXISTS app_settings (
            id INTEGER PRIMARY KEY CHECK (id = 1),
-           provider TEXT NOT NULL DEFAULT 'OpenAI',
+           api_base_url TEXT NOT NULL DEFAULT 'https://api.openai.com/v1',
+           api_mode TEXT NOT NULL DEFAULT 'responses',
+           model TEXT NOT NULL DEFAULT 'gpt-5.4',
            target_language TEXT NOT NULL DEFAULT 'Chinese',
            smart_target_language INTEGER NOT NULL DEFAULT 1,
            shortcut TEXT NOT NULL DEFAULT 'Alt + Space',
@@ -226,7 +236,36 @@ fn migrate(conn: &Connection) -> Result<(), String> {
          );
          CREATE INDEX IF NOT EXISTS idx_translation_history_created_at ON translation_history(created_at DESC);",
     )
-    .map_err(|err| err.to_string())
+    .map_err(|err| err.to_string())?;
+
+    ensure_column(conn, "app_settings", "api_base_url", "TEXT NOT NULL DEFAULT 'https://api.openai.com/v1'")?;
+    ensure_column(conn, "app_settings", "api_mode", "TEXT NOT NULL DEFAULT 'responses'")?;
+    ensure_column(conn, "app_settings", "model", "TEXT NOT NULL DEFAULT 'gpt-5.4'")?;
+    ensure_column(conn, "app_settings", "smart_target_language", "INTEGER NOT NULL DEFAULT 1")?;
+    ensure_column(conn, "app_settings", "auto_copy", "INTEGER NOT NULL DEFAULT 1")?;
+    ensure_column(conn, "app_settings", "api_key_ciphertext", "TEXT")?;
+    ensure_column(conn, "app_settings", "api_key_nonce", "TEXT")?;
+
+    Ok(())
+}
+
+fn ensure_column(conn: &Connection, table: &str, column: &str, definition: &str) -> Result<(), String> {
+    let exists = conn
+        .prepare(&format!("PRAGMA table_info({table})"))
+        .map_err(|err| err.to_string())?
+        .query_map([], |row| row.get::<_, String>(1))
+        .map_err(|err| err.to_string())?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|err| err.to_string())?
+        .iter()
+        .any(|name| name == column);
+
+    if !exists {
+        conn.execute(&format!("ALTER TABLE {table} ADD COLUMN {column} {definition}"), [])
+            .map_err(|err| err.to_string())?;
+    }
+
+    Ok(())
 }
 
 fn ensure_settings_row(conn: &Connection) -> Result<(), String> {
@@ -241,23 +280,25 @@ fn ensure_settings_row(conn: &Connection) -> Result<(), String> {
 
 fn load_settings_from_conn(conn: &Connection) -> Result<AppSettings, String> {
     conn.query_row(
-        "SELECT provider, target_language, smart_target_language, shortcut, shortcut_enabled, theme,
-                font_scale, startup, auto_copy, api_key_ciphertext
+        "SELECT api_base_url, api_mode, model, target_language, smart_target_language, shortcut,
+                shortcut_enabled, theme, font_scale, startup, auto_copy, api_key_ciphertext
          FROM app_settings WHERE id = 1",
         [],
         |row| {
             Ok(AppSettings {
-                provider: row.get(0)?,
-                target_language: row.get(1)?,
-                smart_target_language: row.get::<_, i64>(2)? != 0,
-                shortcut: row.get(3)?,
-                shortcut_enabled: row.get::<_, i64>(4)? != 0,
-                theme: row.get(5)?,
-                font_scale: row.get(6)?,
-                startup: row.get::<_, i64>(7)? != 0,
-                auto_copy: row.get::<_, i64>(8)? != 0,
+                api_base_url: row.get(0)?,
+                api_mode: row.get(1)?,
+                model: row.get(2)?,
+                target_language: row.get(3)?,
+                smart_target_language: row.get::<_, i64>(4)? != 0,
+                shortcut: row.get(5)?,
+                shortcut_enabled: row.get::<_, i64>(6)? != 0,
+                theme: row.get(7)?,
+                font_scale: row.get(8)?,
+                startup: row.get::<_, i64>(9)? != 0,
+                auto_copy: row.get::<_, i64>(10)? != 0,
                 api_key: None,
-                api_key_configured: row.get::<_, Option<String>>(9)?.is_some(),
+                api_key_configured: row.get::<_, Option<String>>(11)?.is_some(),
             })
         },
     )
@@ -325,6 +366,31 @@ fn encryption_key() -> Result<Vec<u8>, String> {
     }
 }
 
+fn normalize_base_url(value: &str) -> String {
+    let trimmed = value.trim().trim_end_matches('/');
+    if trimmed.is_empty() {
+        "https://api.openai.com/v1".to_string()
+    } else {
+        trimmed.to_string()
+    }
+}
+
+fn normalize_api_mode(value: &str) -> String {
+    match value {
+        "chat_completions" => "chat_completions".to_string(),
+        _ => "responses".to_string(),
+    }
+}
+
+fn normalize_model(value: &str) -> String {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        "gpt-5.4".to_string()
+    } else {
+        trimmed.to_string()
+    }
+}
+
 fn bool_to_i64(value: bool) -> i64 {
     if value { 1 } else { 0 }
 }
@@ -335,4 +401,3 @@ pub fn now_ts() -> i64 {
         .map(|duration| duration.as_millis() as i64)
         .unwrap_or_default()
 }
-
