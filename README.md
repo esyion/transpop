@@ -71,6 +71,26 @@ Build the Tauri app:
 pnpm tauri build
 ```
 
+## Releasing Installers
+
+The release workflow is `.github/workflows/publish.yml`. It is triggered by pushing a version tag that starts with `v`, for example `v0.1.0`. The tag must match `src-tauri/tauri.conf.json`'s `version` field.
+
+Release steps:
+
+1. Update the app version in `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and `package.json`.
+2. Commit the version change.
+3. Create and push a matching tag, for example:
+
+   ```bash
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+4. Wait for the **Publish installers** GitHub Actions workflow to finish.
+5. Review the generated draft GitHub Release and publish it manually after confirming the uploaded installers.
+
+You can also rerun the workflow manually from GitHub Actions with an existing tag name.
+
 ## LLM Configuration
 
 Open **Settings → LLM API** in the app and configure:
