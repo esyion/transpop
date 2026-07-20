@@ -1,9 +1,9 @@
 ﻿use tauri::AppHandle;
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
-use crate::window;
+use crate::{db, window};
 
-const DEFAULT_SHORTCUT: &str = "alt+space";
+const FALLBACK_SHORTCUT: &str = "alt+space";
 
 fn normalize_shortcut(shortcut: &str) -> String {
     shortcut
@@ -29,8 +29,15 @@ fn register_shortcut<R: tauri::Runtime>(app: &AppHandle<R>, shortcut: &str) -> R
         .map_err(|err| err.to_string())
 }
 
-pub fn register_default_shortcut<R: tauri::Runtime>(app: &AppHandle<R>) -> Result<(), String> {
-    register_shortcut(app, DEFAULT_SHORTCUT)
+pub fn register_configured_shortcut<R: tauri::Runtime>(app: &AppHandle<R>) -> Result<(), String> {
+    let (shortcut, enabled) = db::get_shortcut_settings(app)
+        .unwrap_or_else(|_| (FALLBACK_SHORTCUT.to_string(), true));
+
+    if !enabled {
+        return Ok(());
+    }
+
+    register_shortcut(app, &shortcut)
 }
 
 #[tauri::command]

@@ -1,6 +1,6 @@
-﻿export type TranslationProvider = "OpenAI" | "DeepL" | "Google";
+﻿export type TranslationProvider = "OpenAI";
 export type ThemeMode = "system" | "light" | "dark";
-export type Language = "Auto" | "Chinese" | "English" | "Japanese" | "Korean" | "French" | "German" | "Spanish";
+export type Language = "Chinese" | "English" | "Japanese" | "Korean" | "French" | "German" | "Spanish";
 export type ViewMode = "translate" | "settings";
 
 export interface TranslationResult {
@@ -12,12 +12,15 @@ export interface TranslationResult {
 export interface TranslationSettings {
   provider: TranslationProvider;
   apiKey: string;
+  apiKeyConfigured: boolean;
   targetLanguage: Language;
+  smartTargetLanguage: boolean;
   shortcut: string;
   shortcutEnabled: boolean;
   theme: ThemeMode;
   fontScale: number;
   startup: boolean;
+  autoCopy: boolean;
 }
 
 export interface HistoryItem {

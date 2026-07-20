@@ -3,12 +3,15 @@
 export const DEFAULT_SETTINGS: TranslationSettings = {
   provider: "OpenAI",
   apiKey: "",
+  apiKeyConfigured: false,
   targetLanguage: "Chinese",
+  smartTargetLanguage: true,
   shortcut: "Alt + Space",
   shortcutEnabled: true,
   theme: "system",
   fontScale: 1,
   startup: false,
+  autoCopy: true,
 };
 
 export const LANGUAGE_OPTIONS = [
@@ -21,5 +24,5 @@ export const LANGUAGE_OPTIONS = [
   "Spanish",
 ] as const;
 
-export const PROVIDER_OPTIONS = ["OpenAI", "DeepL", "Google"] as const;
+export const PROVIDER_OPTIONS = ["OpenAI"] as const;
 export const THEME_OPTIONS = ["system", "light", "dark"] as const;

@@ -10,6 +10,7 @@ interface AppState {
   history: HistoryItem[];
   settings: TranslationSettings;
   view: ViewMode;
+  shortcutError: string | null;
   setInput: (input: string) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -19,6 +20,8 @@ interface AppState {
   setView: (view: ViewMode) => void;
   useHistoryItem: (item: HistoryItem) => void;
   setSettings: (settings: TranslationSettings) => void;
+  setHistory: (history: HistoryItem[]) => void;
+  setShortcutError: (error: string | null) => void;
 }
 
 const MAX_HISTORY = 100;
@@ -31,6 +34,7 @@ export const useAppStore = create<AppState>((set) => ({
   history: [],
   settings: DEFAULT_SETTINGS,
   view: "translate",
+  shortcutError: null,
   setInput: (input) => set({ input }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
@@ -66,4 +70,6 @@ export const useAppStore = create<AppState>((set) => ({
       view: "translate",
     }),
   setSettings: (settings) => set({ settings }),
+  setHistory: (history) => set({ history: history.slice(0, MAX_HISTORY) }),
+  setShortcutError: (shortcutError) => set({ shortcutError }),
 }));

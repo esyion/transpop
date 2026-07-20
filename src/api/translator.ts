@@ -2,7 +2,7 @@
 import type { TranslationResult, TranslationSettings } from "../types/translation";
 
 export interface Translator {
-  translate(text: string, settings: TranslationSettings): Promise<TranslationResult>;
+  translate(text: string, settings: TranslationSettings, targetLanguage: string): Promise<TranslationResult>;
 }
 
 const hasTauriRuntime = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -27,14 +27,13 @@ const fallbackTranslate = (text: string, targetLanguage: string): string => {
 };
 
 class TauriTranslator implements Translator {
-  async translate(text: string, settings: TranslationSettings): Promise<TranslationResult> {
+  async translate(text: string, settings: TranslationSettings, targetLanguage: string): Promise<TranslationResult> {
     if (hasTauriRuntime()) {
       return invoke<TranslationResult>("translate", {
         request: {
           text,
-          targetLanguage: settings.targetLanguage,
+          targetLanguage,
           provider: settings.provider,
-          apiKey: settings.apiKey,
         },
       });
     }
@@ -43,8 +42,8 @@ class TauriTranslator implements Translator {
 
     return {
       sourceLanguage: detectSourceLanguage(text),
-      targetLanguage: settings.targetLanguage,
-      result: fallbackTranslate(text, settings.targetLanguage),
+      targetLanguage,
+      result: fallbackTranslate(text, targetLanguage),
     };
   }
 }

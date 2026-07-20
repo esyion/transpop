@@ -1,5 +1,8 @@
 ﻿use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use tauri::{AppHandle, Runtime};
+
+use crate::db;
 
 const OPENAI_RESPONSES_URL: &str = "https://api.openai.com/v1/responses";
 const DEFAULT_OPENAI_MODEL: &str = "gpt-5.4";
@@ -18,32 +21,45 @@ pub struct TranslateRequest {
     pub text: String,
     pub target_language: String,
     pub provider: String,
-    pub api_key: Option<String>,
 }
 
 #[tauri::command]
-pub async fn translate(request: TranslateRequest) -> Result<TranslationResult, String> {
+pub async fn translate<R: Runtime>(
+    app: AppHandle<R>,
+    request: TranslateRequest,
+) -> Result<TranslationResult, String> {
     let text = request.text.trim();
     if text.is_empty() {
         return Err("text is empty".to_string());
     }
 
-    match request.provider.as_str() {
-        "OpenAI" => translate_with_openai(text, &request.target_language, request.api_key).await,
+    let result = match request.provider.as_str() {
+        "OpenAI" => translate_with_openai(&app, text, &request.target_language).await,
         "DeepL" | "Google" => Err(format!(
             "{} provider is reserved but not implemented yet",
             request.provider
         )),
         other => Err(format!("unsupported provider: {other}")),
-    }
+    }?;
+
+    db::insert_history(&app, &db::HistoryItem {
+        id: format!("{}-{}", db::now_ts(), text.len()),
+        input: text.to_string(),
+        output: result.result.clone(),
+        source_language: result.source_language.clone(),
+        target_language: result.target_language.clone(),
+        created_at: db::now_ts(),
+    })?;
+
+    Ok(result)
 }
 
-async fn translate_with_openai(
+async fn translate_with_openai<R: Runtime>(
+    app: &AppHandle<R>,
     text: &str,
     target_language: &str,
-    api_key: Option<String>,
 ) -> Result<TranslationResult, String> {
-    let api_key = api_key
+    let api_key = db::get_decrypted_api_key(app)?
         .map(|key| key.trim().to_string())
         .filter(|key| !key.is_empty())
         .ok_or_else(|| "OpenAI API key is required".to_string())?;
@@ -136,4 +152,3 @@ fn extract_output_text(payload: &Value) -> Option<String> {
         Some(text)
     }
 }
-

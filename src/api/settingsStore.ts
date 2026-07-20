@@ -1,8 +1,9 @@
-﻿import { DEFAULT_SETTINGS } from "../utils/constants";
-import type { TranslationSettings } from "../types/translation";
+﻿import { invoke } from "@tauri-apps/api/core";
+import { DEFAULT_SETTINGS } from "../utils/constants";
+import type { HistoryItem, TranslationSettings } from "../types/translation";
 
-const STORE_PATH = "settings.json";
 const SETTINGS_KEY = "settings";
+const HISTORY_KEY = "history";
 
 const hasTauriRuntime = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
@@ -12,20 +13,32 @@ export async function loadSettings(): Promise<TranslationSettings> {
     return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
   }
 
-  const { load } = await import("@tauri-apps/plugin-store");
-  const store = await load(STORE_PATH, { autoSave: true });
-  const stored = await store.get<Partial<TranslationSettings>>(SETTINGS_KEY);
-  return { ...DEFAULT_SETTINGS, ...stored };
+  const stored = await invoke<Partial<TranslationSettings>>("get_app_settings");
+  return { ...DEFAULT_SETTINGS, ...stored, apiKey: "" };
 }
 
-export async function saveSettings(settings: TranslationSettings): Promise<void> {
+export async function saveSettings(settings: TranslationSettings): Promise<TranslationSettings> {
   if (!hasTauriRuntime()) {
-    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-    return;
+    const next = { ...settings, apiKeyConfigured: settings.apiKeyConfigured || settings.apiKey.trim().length > 0 };
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+    return next;
   }
 
-  const { load } = await import("@tauri-apps/plugin-store");
-  const store = await load(STORE_PATH, { autoSave: true });
-  await store.set(SETTINGS_KEY, settings);
-  await store.save();
+  const saved = await invoke<Partial<TranslationSettings>>("save_app_settings", { settings });
+  return { ...DEFAULT_SETTINGS, ...saved, apiKey: "" };
+}
+
+export async function loadRecentHistory(limit = 3): Promise<HistoryItem[]> {
+  if (!hasTauriRuntime()) {
+    const raw = window.localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw).slice(0, limit) : [];
+  }
+
+  return invoke<HistoryItem[]>("list_recent_history", { limit });
+}
+
+export function saveBrowserHistory(items: HistoryItem[]): void {
+  if (!hasTauriRuntime()) {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 100)));
+  }
 }
