@@ -9,8 +9,8 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantClasses: Record<BadgeVariant, string> = {
   default: "border-border bg-muted/70 text-muted-foreground",
-  secondary: "border-border bg-muted/70 text-muted-foreground",
-  outline: "border-border bg-background text-foreground",
+  secondary: "border-border bg-muted/60 text-muted-foreground",
+  outline: "border-border bg-card/65 text-foreground",
   destructive: "border-destructive/30 bg-destructive/10 text-destructive",
 };
 
@@ -19,7 +19,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     <span
       ref={ref}
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-medium",
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-[0.045em]",
         variantClasses[variant],
         className,
       )}

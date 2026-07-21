@@ -204,12 +204,6 @@ function App() {
     }
   }, [setSettings, setShortcutError, settings]);
 
-  useEffect(() => {
-    if (!hasTauriRuntime()) return;
-    void invoke("set_hide_on_blur", {
-      enabled: view === "translate" && !paletteOpen,
-    }).catch((cause) => console.error("failed to update blur behavior", cause));
-  }, [paletteOpen, view]);
 
   const hydrateInputFromClipboard = async () => {
     const clipboardText = await readClipboardText();
@@ -471,44 +465,38 @@ function App() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden px-6 py-8"
+      className="app-shell relative min-h-screen overflow-hidden"
       onKeyDown={handleShellKeyDown}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.18),transparent_24%),radial-gradient(circle_at_100%_0%,rgba(96,165,250,0.08),transparent_22%)]" />
+      <div className="app-aura pointer-events-none absolute inset-0" />
       <motion.section
         initial={{ opacity: 0, scale: 0.98, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.16, ease: "easeOut" }}
-        className="relative mx-auto flex w-full max-w-[900px] flex-col overflow-hidden rounded-[20px] border border-border/80 bg-card/80 shadow-[0_20px_70px_rgba(17,24,39,0.15)] backdrop-blur-2xl"
+        className="app-window relative mx-auto flex w-full max-w-[920px] flex-col"
         aria-label="TransPop translator"
       >
-        <header className="flex items-center justify-between gap-4 border-b border-border/70 px-6 py-4">
+        <header className="app-header">
           <button
             type="button"
             onClick={() => setView("translate")}
-            className="flex items-center gap-3 rounded-[12px] text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="brand-lockup outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Back to translate"
           >
-            <span className="grid size-10 place-items-center rounded-[14px] border border-border bg-background text-lg shadow-sm">
-              🌍
-            </span>
-            <span className="grid gap-0.5">
-              <strong className="text-xl font-semibold tracking-[-0.03em] text-foreground">
-                Translate
-              </strong>
-              <span className="text-xs text-muted-foreground">
-                {languageHint}
-              </span>
+            <span className="brand-mark" aria-hidden="true"><Languages size={18} /></span>
+            <span className="brand-copy">
+              <strong className="brand-title text-foreground">TransPop</strong>
+              <span className="brand-subtitle">{languageHint}</span>
             </span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="hidden sm:inline-flex">
+          <div className="header-tools">
+            <Badge variant="secondary" className="status-badge hidden sm:inline-flex">
               {settings.smartTargetLanguage
                 ? "Smart language"
                 : effectiveTargetLanguage}
             </Badge>
-            <Badge variant={settings.shortcutEnabled ? "outline" : "secondary"}>
+            <Badge className="shortcut-badge" variant={settings.shortcutEnabled ? "outline" : "secondary"}>
               {settings.shortcutEnabled ? settings.shortcut : "Shortcut off"}
             </Badge>
             <Button
@@ -534,7 +522,7 @@ function App() {
           </div>
         </header>
 
-        <div className="max-h-[500px] overflow-auto px-6 py-5">
+        <div className="app-content">
           <AnimatePresence mode="wait">
             {view === "translate" ? (
               <motion.div
@@ -543,16 +531,15 @@ function App() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.12, ease: "easeOut" }}
-                className="grid gap-4"
+                className="translation-layout grid gap-4"
               >
-                <div className="grid gap-3 rounded-[16px] border border-border bg-background/95 p-4 shadow-[0_1px_0_rgba(255,255,255,0.35)]">
-                  <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-2 font-medium text-foreground/80">
-                      <Languages size={14} /> Input
+                <div className="input-panel">
+                  <div className="panel-label-row">
+                    <span className="section-kicker">
+                      <span className="mini-seal" aria-hidden="true" /> Source text
                     </span>
                     <span>
-                      Auto translates 1s after typing stops · Shift+Enter for
-                      newline
+                      Auto in 1s · Shift+Enter for newline
                     </span>
                   </div>
                   <label className="sr-only" htmlFor="translate-input">
@@ -570,11 +557,11 @@ function App() {
                     placeholder="Type something or copy text before opening..."
                     rows={2}
                     spellCheck="false"
-                    className="min-h-[52px] border-0 bg-transparent p-0 text-[18px] shadow-none focus-visible:ring-0"
+                    className="input-textarea focus-visible:ring-0"
                   />
                 </div>
 
-                <Separator />
+                <Separator className="ink-divider" />
 
                 <ResultArea
                   loading={loading}
@@ -595,14 +582,14 @@ function App() {
                   activeId={history[historyIndex]?.id}
                 />
 
-                <footer className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5">
+                <footer className="shortcut-strip">
+                  <span className="shortcut-chip">
                     <Sparkles size={13} /> Auto after 1s
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5">
+                  <span className="shortcut-chip">
                     <kbd className="font-medium text-foreground">Enter</kbd> Now
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5">
+                  <span className="shortcut-chip">
                     <kbd className="font-medium text-foreground">Esc</kbd> Close
                   </span>
                 </footer>
@@ -625,7 +612,7 @@ function App() {
       <AnimatePresence>
         {paletteOpen ? (
           <motion.div
-            className="fixed inset-0 z-50 grid place-items-start bg-black/25 px-4 pt-[14vh] backdrop-blur-sm"
+            className="command-overlay fixed inset-0 z-50 grid place-items-start px-4 pt-[14vh]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -638,7 +625,7 @@ function App() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 8 }}
               transition={{ duration: 0.12, ease: "easeOut" }}
-              className="mx-auto w-full max-w-[640px] overflow-hidden rounded-[18px] border border-border bg-popover/95 shadow-[0_24px_80px_rgba(15,23,42,0.24)]"
+              className="command-palette mx-auto w-full max-w-[640px]"
             >
               <CommandMenu className="w-full bg-transparent text-popover-foreground">
                 <div className="flex items-center gap-2 border-b border-border/70 px-4 py-3 text-muted-foreground">
@@ -722,7 +709,7 @@ function ResultArea({
 }: ResultAreaProps) {
   if (loading) {
     return (
-      <Card className="border-border/70 bg-background/80 shadow-[0_1px_0_rgba(255,255,255,0.35)]">
+      <Card className="result-card border-border/70">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-foreground/80">
             <Languages size={15} /> Thinking...
@@ -732,8 +719,8 @@ function ResultArea({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="h-4 w-3/4 animate-pulse rounded-full bg-muted" />
-          <div className="h-4 w-1/2 animate-pulse rounded-full bg-muted" />
+          <div className="skeleton-line h-4 w-3/4 rounded-full" />
+          <div className="skeleton-line h-4 w-1/2 rounded-full" />
           <div className="flex gap-1.5 pt-2" aria-hidden="true">
             <span className="size-1.5 animate-pulse rounded-full bg-primary/80 [animation-delay:0ms]" />
             <span className="size-1.5 animate-pulse rounded-full bg-primary/80 [animation-delay:120ms]" />
@@ -746,7 +733,7 @@ function ResultArea({
 
   if (apiKeyMissing) {
     return (
-      <Card className="border-primary/25 bg-background/90">
+      <Card className="result-card border-primary/25">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-foreground">
             Add API Key to start translating
@@ -767,7 +754,7 @@ function ResultArea({
 
   if (error) {
     return (
-      <Card className="border-destructive/25 bg-background/80">
+      <Card className="result-card border-destructive/25">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-destructive">
             Unable to translate.
@@ -788,7 +775,7 @@ function ResultArea({
 
   if (!resultText) {
     return (
-      <Card className="border-dashed border-border/70 bg-background/70">
+      <Card className="result-card empty-result border-border/70">
         <CardContent className="grid gap-1 py-10 text-sm">
           <strong className="text-base font-semibold text-foreground">
             Start typing or paste text
@@ -802,12 +789,10 @@ function ResultArea({
   }
 
   return (
-    <Card className="border-border/70 bg-background/90 shadow-[0_1px_0_rgba(255,255,255,0.35)]">
+    <Card className="result-card border-border/70">
       <CardHeader className="flex-row items-start justify-between gap-4 pb-3">
         <div className="space-y-1">
-          <CardTitle className="text-sm font-medium text-foreground/80">
-            Translation
-          </CardTitle>
+          <CardTitle className="result-title text-foreground">Translation</CardTitle>
           <CardDescription>
             {autoCopy
               ? "Copied automatically. Retry if you need a refreshed result."
@@ -824,7 +809,7 @@ function ResultArea({
         </Button>
       </CardHeader>
       <CardContent className="grid gap-4">
-        <p className="whitespace-pre-wrap text-[18px] leading-7 text-foreground">
+        <p className="result-text whitespace-pre-wrap">
           {resultText}
         </p>
         <div className="flex flex-wrap items-center gap-2">
@@ -856,19 +841,17 @@ function RecentHistory({
   if (items.length === 0) return null;
 
   return (
-    <div className="grid gap-2">
-      <div className="text-xs font-medium text-muted-foreground">
-        Recent translations
-      </div>
+    <div className="history-section">
+      <div className="history-heading">Recent translations</div>
       <div className="grid gap-2">
         {items.slice(0, 3).map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => onUse(item)}
-            className={`rounded-xl border px-3 py-2 text-left text-xs transition hover:bg-muted/60 ${
+            className={`history-card border px-3 py-2 text-left text-xs ${
               activeId === item.id
-                ? "border-primary/50 bg-primary/10"
+                ? "is-active border-primary/50 bg-primary/10"
                 : "border-border bg-background/70"
             }`}
           >
@@ -884,5 +867,3 @@ function RecentHistory({
 }
 
 export default App;
-
-

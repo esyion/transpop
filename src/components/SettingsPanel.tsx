@@ -47,11 +47,12 @@ export function SettingsPanel() {
   };
 
   return (
-    <section className="grid gap-4 md:grid-cols-[150px_minmax(0,1fr)]" aria-label="Settings">
-      <nav className="grid content-start gap-1 rounded-[16px] border border-border bg-background/70 p-2" aria-label="Settings sections">
+    <section className="settings-layout" aria-label="Settings">
+      <nav className="settings-nav" aria-label="Settings sections">
         {navItems.map((item, index) => (
           <button
-            className={`rounded-[10px] px-3 py-2 text-left text-sm transition ${index === 0 ? "bg-accent/10 text-foreground" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}`}
+            className={`settings-nav-button px-3 py-2 text-left text-sm ${index === 0 ? "is-active" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}`}
+            aria-current={index === 0 ? "page" : undefined}
             type="button"
             key={item}
           >
@@ -60,7 +61,7 @@ export function SettingsPanel() {
         ))}
       </nav>
 
-      <div className="grid max-h-[365px] gap-3 overflow-auto pr-1">
+      <div className="settings-list grid max-h-[365px] gap-3 overflow-auto pr-1">
         <SettingGroup
           icon={<PlugZap size={17} />}
           title="LLM API"
@@ -75,7 +76,7 @@ export function SettingsPanel() {
           </Field>
 
           <Field label="Interface">
-            <div className="grid grid-cols-2 gap-1 rounded-[12px] border border-border bg-background p-1">
+            <div className="setting-row grid grid-cols-2 gap-1 border border-border p-1">
               {API_MODE_OPTIONS.map((mode) => (
                 <Button
                   key={mode.value}
@@ -100,7 +101,7 @@ export function SettingsPanel() {
           </Field>
 
           <Field label="API Key">
-            <div className="flex gap-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2">
               <Input
                 value={apiKeyDraft}
                 type="password"
@@ -132,7 +133,7 @@ export function SettingsPanel() {
           />
           <Field label="Fallback target language">
             <select
-              className="h-10 rounded-[12px] border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-primary/20 disabled:opacity-50"
+              className="setting-row h-10 border border-border px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
               value={settings.targetLanguage}
               disabled={settings.smartTargetLanguage}
               onChange={(event) => updateSettings({ targetLanguage: event.currentTarget.value as Language })}
@@ -232,9 +233,9 @@ interface SettingGroupProps {
 
 function SettingGroup({ icon, title, description, children }: SettingGroupProps) {
   return (
-    <Card className="border-border/70 bg-background/75">
+    <Card className="setting-card border-border/70">
       <CardHeader className="grid grid-cols-[32px_1fr] gap-3 pb-3">
-        <span className="grid size-8 place-items-center rounded-[10px] bg-primary/10 text-primary" aria-hidden="true">{icon}</span>
+        <span className="setting-icon grid size-8 place-items-center" aria-hidden="true">{icon}</span>
         <div>
           <CardTitle className="text-sm">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
@@ -247,7 +248,7 @@ function SettingGroup({ icon, title, description, children }: SettingGroupProps)
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="grid gap-1.5 text-xs font-medium text-muted-foreground">
+    <label className="grid gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-muted-foreground">
       {label}
       {children}
     </label>
@@ -256,7 +257,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 function SwitchRow({ label, checked, onCheckedChange }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
   return (
-    <label className="flex items-center justify-between gap-4 rounded-[12px] border border-border bg-background px-3 py-2 text-sm">
+    <label className="setting-row flex items-center justify-between gap-4 border border-border px-3 py-2.5 text-sm">
       <span>{label}</span>
       <Switch checked={checked} onChange={(event) => onCheckedChange(event.currentTarget.checked)} />
     </label>

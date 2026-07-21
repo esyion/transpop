@@ -8,9 +8,18 @@ pub fn show_main<R: Runtime>(app: &AppHandle<R>) -> Result<(), String> {
         .get_webview_window(MAIN_WINDOW_LABEL)
         .ok_or_else(|| "main window not found".to_string())?;
 
-    window.center().map_err(|err| err.to_string())?;
+    // Unhide and bring to front first
     window.show().map_err(|err| err.to_string())?;
+    
+    // Request user attention to ensure window is visually prominent
+    window.request_user_attention(Some(tauri::UserAttentionType::Informational))
+        .map_err(|err| err.to_string())?;
+
+    // Set focus with a small delay to ensure window is ready
+    std::thread::sleep(std::time::Duration::from_millis(50));
     window.set_focus().map_err(|err| err.to_string())?;
+    
+    // Emit focus event after window is ready
     app.emit(FOCUS_INPUT_EVENT, ())
         .map_err(|err| err.to_string())?;
 

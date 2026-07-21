@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS: TranslationSettings = {
   smartTargetLanguage: true,
   shortcut: "Alt + Space",
   shortcutEnabled: true,
-  theme: "system",
+  theme: "light",
   fontScale: 1,
   startup: false,
   autoCopy: true,
