@@ -1,0 +1,108 @@
+﻿import { AnimatePresence, motion } from "framer-motion";
+import {
+  Command as CommandMenu,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "cmdk";
+import {
+  Copy,
+  Languages,
+  RotateCcw,
+  Search,
+  Settings,
+  Sparkles,
+  X,
+} from "lucide-react";
+
+export const commandItems = [
+  { label: "Translate now", hint: "Enter", action: "translate", icon: Sparkles },
+  { label: "Copy result", hint: "Ctrl/Cmd + C", action: "copy", icon: Copy },
+  { label: "Retry", hint: "R", action: "retry", icon: RotateCcw },
+  { label: "Open settings", hint: "S", action: "settings", icon: Settings },
+  { label: "Clear input", hint: "⌫", action: "clear", icon: X },
+  {
+    label: "Back to translate",
+    hint: "Esc",
+    action: "translate-view",
+    icon: Languages,
+  },
+] as const;
+
+export type CommandAction = (typeof commandItems)[number]["action"];
+
+interface CommandPaletteProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onExecute: (action: CommandAction) => void;
+}
+
+export function CommandPalette({
+  open,
+  onOpenChange,
+  onExecute,
+}: CommandPaletteProps) {
+  return (
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          className="command-overlay fixed inset-0 z-50 grid place-items-start px-4 pt-[14vh]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onOpenChange(false);
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ duration: 0.12, ease: "easeOut" }}
+            className="command-palette mx-auto w-full max-w-[640px]"
+          >
+            <CommandMenu className="w-full bg-transparent text-popover-foreground">
+              <div className="flex items-center gap-2 border-b border-border/70 px-4 py-3 text-muted-foreground">
+                <Search size={16} />
+                <CommandInput
+                  autoFocus
+                  placeholder="Search actions..."
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") onOpenChange(false);
+                  }}
+                />
+              </div>
+              <CommandList className="max-h-[320px] overflow-auto p-2">
+                <CommandEmpty className="px-3 py-8 text-center text-sm text-muted-foreground">
+                  No actions found.
+                </CommandEmpty>
+                <CommandGroup
+                  heading="Actions"
+                  className="px-1 py-1 text-xs text-muted-foreground"
+                >
+                  {commandItems.map(({ label, hint, action, icon: Icon }) => (
+                    <CommandItem
+                      key={action}
+                      value={label}
+                      onSelect={() => onExecute(action)}
+                      className="flex cursor-pointer items-center justify-between gap-4 rounded-[12px] px-3 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-foreground"
+                    >
+                      <span className="flex items-center gap-3">
+                        <Icon size={16} className="text-muted-foreground" />
+                        {label}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{hint}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </CommandMenu>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+  );
+}

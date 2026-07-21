@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">TransPop logo</title>
+  <desc id="desc">Two overlapping speech bubbles with opposing arrows, representing instant translation.</desc>
+  <defs>
+    <linearGradient id="bg" x1="176" y1="128" x2="848" y2="896" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2374C6"/>
+      <stop offset="0.52" stop-color="#1661AB"/>
+      <stop offset="1" stop-color="#103F78"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="384" y1="396" x2="806" y2="804" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8AD5E3"/>
+      <stop offset="1" stop-color="#63BBD0"/>
+    </linearGradient>
+  </defs>
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="url(#bg)"/>
+  <rect x="80" y="80" width="864" height="864" rx="208" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="8"/>
+  <path d="M442 392H712C786 392 826 432 826 506V650C826 724 786 764 712 764H690L690 838L602 764H442C368 764 328 724 328 650V506C328 432 368 392 442 392Z" fill="url(#cyan)"/>
+  <path d="M302 236H640C714 236 754 276 754 350V498C754 572 714 612 640 612H468L354 704L366 612H302C228 612 188 572 188 498V350C188 276 228 236 302 236Z" fill="#FFFEF8"/>
+  <path d="M318 388H574" stroke="#1661AB" stroke-width="54" stroke-linecap="round"/>
+  <path d="M548 318L626 388L548 458" fill="none" stroke="#1661AB" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M668 642H478" stroke="#153E68" stroke-width="46" stroke-linecap="round"/>
+  <path d="M500 586L438 642L500 698" fill="none" stroke="#153E68" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

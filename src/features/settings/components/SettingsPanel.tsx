@@ -1,16 +1,16 @@
 ﻿import { Check, KeyRound, Monitor, Palette, PlugZap, Power, ShieldCheck, Type } from "lucide-react";
-import type { KeyboardEvent, ReactNode } from "react";
+import type { KeyboardEvent } from "react";
 import { useState } from "react";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Switch } from "./ui/switch";
-import { useAppStore } from "../store/appStore";
-import { API_MODE_OPTIONS, LANGUAGE_OPTIONS, THEME_OPTIONS } from "../utils/constants";
-import type { ApiMode, Language, ThemeMode } from "../types/translation";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
 
-const navItems = ["General", "Translation", "Appearance", "Shortcut", "About"];
+import { Input } from "../../../components/ui/input";
+
+import { useAppStore } from "../../../store/appStore";
+import { API_MODE_OPTIONS, LANGUAGE_OPTIONS, THEME_OPTIONS } from "../../../utils/constants";
+import type { ApiMode, Language, ThemeMode } from "../../../types/translation";
+import { Field, SettingGroup, SwitchRow } from "./SettingsPrimitives";
+
 
 export function SettingsPanel() {
   const { settings, shortcutError, updateSettings } = useAppStore();
@@ -48,20 +48,7 @@ export function SettingsPanel() {
 
   return (
     <section className="settings-layout" aria-label="Settings">
-      <nav className="settings-nav" aria-label="Settings sections">
-        {navItems.map((item, index) => (
-          <button
-            className={`settings-nav-button px-3 py-2 text-left text-sm ${index === 0 ? "is-active" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}`}
-            aria-current={index === 0 ? "page" : undefined}
-            type="button"
-            key={item}
-          >
-            {item}
-          </button>
-        ))}
-      </nav>
-
-      <div className="settings-list grid max-h-[365px] gap-3 overflow-auto pr-1">
+      <div className="settings-list grid gap-3">
         <SettingGroup
           icon={<PlugZap size={17} />}
           title="LLM API"
@@ -224,43 +211,4 @@ function normalizeKey(key: string) {
   return key;
 }
 
-interface SettingGroupProps {
-  icon: ReactNode;
-  title: string;
-  description: string;
-  children: ReactNode;
-}
-
-function SettingGroup({ icon, title, description, children }: SettingGroupProps) {
-  return (
-    <Card className="setting-card border-border/70">
-      <CardHeader className="grid grid-cols-[32px_1fr] gap-3 pb-3">
-        <span className="setting-icon grid size-8 place-items-center" aria-hidden="true">{icon}</span>
-        <div>
-          <CardTitle className="text-sm">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent className="grid gap-3">{children}</CardContent>
-    </Card>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="grid gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-muted-foreground">
-      {label}
-      {children}
-    </label>
-  );
-}
-
-function SwitchRow({ label, checked, onCheckedChange }: { label: string; checked: boolean; onCheckedChange: (checked: boolean) => void }) {
-  return (
-    <label className="setting-row flex items-center justify-between gap-4 border border-border px-3 py-2.5 text-sm">
-      <span>{label}</span>
-      <Switch checked={checked} onChange={(event) => onCheckedChange(event.currentTarget.checked)} />
-    </label>
-  );
-}
 

@@ -1,0 +1,17 @@
+﻿.command-overlay {
+  background: rgba(47, 47, 53, 0.2) !important;
+  backdrop-filter: blur(3px);
+}
+
+.command-palette {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px !important;
+  background: var(--popover) !important;
+  box-shadow: 0 16px 40px rgba(47, 47, 53, 0.16) !important;
+}
+
+.command-palette::before {
+  display: none;
+}
+

@@ -1,0 +1,104 @@
+﻿
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+}
+
+:root {
+  --font-scale: 1;
+
+  /* 简约浅色主题：月白纸面 + 云峰白边框 + 靛青交互。 */
+  --background: #fffef8;
+  --foreground: #2f2f35;
+  --card: #fffef8;
+  --card-foreground: #2f2f35;
+  --popover: #fffef8;
+  --popover-foreground: #2f2f35;
+  --muted: #f8f4ed;
+  --muted-foreground: #737c7b;
+  --border: #d8e3e7;
+  --input: #cdd9de;
+  --ring: rgba(22, 97, 171, 0.24);
+  --primary: #1661ab;
+  --primary-foreground: #fffef8;
+  --accent: #eef7f2;
+  --accent-foreground: #2f2f35;
+  --destructive: #c04851;
+  --destructive-foreground: #fffef8;
+  --surface-soft: #f8f4ed;
+  --surface-tint: #eef7f2;
+  --shadow-soft: rgba(47, 47, 53, 0.08);
+
+  color-scheme: light;
+  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --background: #f8f4ed;
+    --foreground: #2f2f35;
+    --card: #fffef8;
+    --card-foreground: #2f2f35;
+    --popover: #fffef8;
+    --popover-foreground: #2f2f35;
+    --muted: #f8f4ed;
+    --muted-foreground: #737c7b;
+    --border: #d8e3e7;
+    --input: #cdd9de;
+    --ring: rgba(22, 97, 171, 0.24);
+    --primary: #1661ab;
+    --primary-foreground: #fffef8;
+    --accent: #eef7f2;
+    --accent-foreground: #2f2f35;
+    --destructive: #c04851;
+    --destructive-foreground: #fffef8;
+    --surface-soft: #f8f4ed;
+    --surface-tint: #eef7f2;
+    --shadow-soft: rgba(47, 47, 53, 0.08);
+    color-scheme: light;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #2f2f35;
+  --foreground: #fffef8;
+  --card: #393733;
+  --card-foreground: #fffef8;
+  --popover: #393733;
+  --popover-foreground: #fffef8;
+  --muted: #4f5c69;
+  --muted-foreground: #b2bbbe;
+  --border: rgba(216, 227, 231, 0.22);
+  --input: rgba(216, 227, 231, 0.28);
+  --ring: rgba(99, 187, 208, 0.36);
+  --primary: #63bbd0;
+  --primary-foreground: #142334;
+  --accent: rgba(99, 187, 208, 0.15);
+  --accent-foreground: #fffef8;
+  --destructive: #ed556a;
+  --destructive-foreground: #fffef8;
+  --surface-soft: #393733;
+  --surface-tint: #2b333e;
+  --shadow-soft: rgba(0, 0, 0, 0.22);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+

@@ -1,0 +1,26 @@
+﻿.settings-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.settings-list {
+  width: 100%;
+}
+
+.setting-card {
+  border-radius: 12px !important;
+  background: var(--card) !important;
+  box-shadow: 0 3px 12px var(--shadow-soft) !important;
+}
+
+.setting-icon {
+  border-radius: 8px !important;
+  background: var(--surface-tint) !important;
+  color: var(--primary) !important;
+}
+
+.setting-row {
+  border-radius: 9px !important;
+  background: var(--surface-soft) !important;
+}
+

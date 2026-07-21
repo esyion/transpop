@@ -1,0 +1,53 @@
+﻿@keyframes loading-shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .app-header {
+    padding: 14px 15px;
+  }
+
+  .brand-kicker,
+  .status-badge {
+    display: none !important;
+  }
+
+  .header-tools {
+    gap: 3px;
+  }
+
+  .shortcut-badge {
+    max-width: 116px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-content {
+    max-height: calc(100vh - 100px);
+    padding: 15px;
+  }
+
+  .panel-label-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

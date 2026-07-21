@@ -1,6 +1,8 @@
-﻿use tauri::{Manager, WindowEvent};
+use tauri::{Manager, WindowEvent};
 
 mod db;
+#[cfg(dev)]
+mod dev_watchdog;
 mod shortcut;
 mod translate;
 mod window;
@@ -25,6 +27,9 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             db::init(&handle)?;
+
+            #[cfg(dev)]
+            dev_watchdog::start(handle.clone());
 
             if let Some(window) = app.get_webview_window("main") {
                 window.center()?;

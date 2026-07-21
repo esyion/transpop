@@ -1,4 +1,4 @@
-﻿# TransPop
+# TransPop
 
 TransPop is a lightweight desktop translation popup built with Tauri, React, and TypeScript. It is designed for a fast workflow: summon the window, type or paste text, get a translation automatically, and let the window disappear when you return to your work.
 
@@ -13,7 +13,7 @@ TransPop is a lightweight desktop translation popup built with Tauri, React, and
   - Chat Completions API (`/chat/completions`)
   - Anthropic Messages API is not supported.
 - **Smart target language**: Chinese input defaults to English; other input defaults to Chinese.
-- **Clipboard-assisted workflow**: reads clipboard text when the popup is summoned and can auto-copy translation results.
+- **Paste-ready workflow**: the global shortcut focuses the input immediately; paste or type text, while optional auto-copy keeps translated results ready to use.
 - **Local persistence**: settings, shortcut state, API configuration, and recent translation history are stored locally in SQLite.
 - **API key safety**: API keys are encrypted before being saved in SQLite; the encryption key is stored with the OS keyring.
 - **Recent history**: shows the latest 3 translations in the popup and keeps up to 100 local history records.
@@ -92,7 +92,7 @@ You can also rerun the workflow manually from GitHub Actions with an existing ta
 
 ## LLM Configuration
 
-Open **Settings → LLM API** in the app and configure:
+Open **Settings 閳?LLM API** in the app and configure:
 
 - **Base URL**: the OpenAI-compatible API base URL, for example `https://api.openai.com/v1`.
 - **Interface**: choose `Responses` or `Chat Completions`.
@@ -117,10 +117,15 @@ TransPop stores local application data in a SQLite database under the Tauri app 
 
 ```text
 src/
-  App.tsx                  # Main UI and interaction flow
-  components/              # Settings panel and UI primitives
+  App.tsx                  # Thin application entry point
+  app/                     # Application shell and lifecycle hooks
+  features/                # Feature modules (translation, settings, command palette)
+  components/layout/       # Shared application layout components
+  components/ui/           # Reusable UI primitives
   api/                     # Frontend Tauri API wrappers
+  lib/                     # Runtime and clipboard adapters
   store/                   # Zustand state
+  styles/                  # Global theme, base, layout, and responsive styles
   types/                   # Shared frontend types
 
 src-tauri/src/
