@@ -1,5 +1,5 @@
 ﻿.command-overlay {
-  background: rgba(47, 47, 53, 0.2) !important;
+  background: rgba(28, 43, 56, 0.28) !important;
   backdrop-filter: blur(3px);
 }
 
@@ -8,10 +8,9 @@
   border: 1px solid var(--border);
   border-radius: 12px !important;
   background: var(--popover) !important;
-  box-shadow: 0 16px 40px rgba(47, 47, 53, 0.16) !important;
+  box-shadow: 0 16px 40px var(--shadow-soft) !important;
 }
 
 .command-palette::before {
   display: none;
 }
-

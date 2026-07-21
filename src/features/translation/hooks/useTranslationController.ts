@@ -1,6 +1,9 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { loadRecentHistory, saveBrowserHistory } from "../../../api/settingsStore";
+import {
+  loadRecentHistory,
+  saveBrowserHistory,
+} from "../../../api/settingsStore";
 import { translator } from "../../../api/translator";
 import { writeClipboardText } from "../../../lib/clipboard";
 import { hasTauriRuntime } from "../../../lib/runtime";
@@ -62,10 +65,21 @@ export function useTranslationController() {
   const refreshRecentHistory = useCallback(
     async (fallbackHistory?: HistoryItem[]) => {
       if (hasTauriRuntime()) {
-        setHistory(await loadRecentHistory(3));
+        try {
+          const loaded = await loadRecentHistory(3);
+          setHistory(loaded);
+        } catch {
+          console.warn("Failed to load recent history");
+          // Fallback to provided history on failure
+          if (fallbackHistory) setHistory(fallbackHistory);
+        }
         return;
       }
-      if (fallbackHistory) saveBrowserHistory(fallbackHistory);
+      // Browser environment: save and update state
+      if (fallbackHistory) {
+        saveBrowserHistory(fallbackHistory);
+        setHistory(fallbackHistory);
+      }
     },
     [setHistory],
   );
@@ -108,18 +122,25 @@ export function useTranslationController() {
         if (requestId !== translateRequestIdRef.current) return;
 
         setResult(text, nextResult);
-        const nextHistory: HistoryItem[] = [
-          {
-            id: crypto.randomUUID(),
-            input: text,
-            output: nextResult.result,
-            sourceLanguage: String(nextResult.sourceLanguage),
-            targetLanguage: String(nextResult.targetLanguage),
-            createdAt: Date.now(),
-          },
-          ...history,
-        ].slice(0, 3);
+
+        // Build new history item
+        const nextHistoryItem: HistoryItem = {
+          id: crypto.randomUUID(),
+          input: text,
+          output: nextResult.result,
+          sourceLanguage: String(nextResult.sourceLanguage),
+          targetLanguage: String(nextResult.targetLanguage),
+          createdAt: Date.now(),
+        };
+
+        // Check again if request is still valid before updating history
+        if (requestId !== translateRequestIdRef.current) return;
+
+        const nextHistory = [nextHistoryItem, ...history].slice(0, 3);
         await refreshRecentHistory(nextHistory);
+
+        // Check again after async history refresh
+        if (requestId !== translateRequestIdRef.current) return;
 
         if (settings.autoCopy) {
           await writeClipboardText(nextResult.result);
@@ -128,6 +149,7 @@ export function useTranslationController() {
         } else {
           toast.success("Translation ready");
         }
+        debugger;
       } catch (cause) {
         if (requestId !== translateRequestIdRef.current) return;
         console.error(cause);
@@ -222,4 +244,3 @@ export function useTranslationController() {
     resetHistoryIndex,
   };
 }
-

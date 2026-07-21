@@ -1,10 +1,11 @@
-use tauri::{Manager, WindowEvent};
+﻿use tauri::{Manager, WindowEvent};
 
 mod db;
 #[cfg(dev)]
 mod dev_watchdog;
 mod shortcut;
 mod translate;
+mod tray;
 mod window;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -30,6 +31,11 @@ pub fn run() {
 
             #[cfg(dev)]
             dev_watchdog::start(handle.clone());
+
+            // Create system tray
+            if let Err(err) = tray::create_tray(&handle) {
+                eprintln!("failed to create system tray: {}", err);
+            }
 
             if let Some(window) = app.get_webview_window("main") {
                 window.center()?;

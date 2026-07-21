@@ -44,7 +44,7 @@
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #cdd9de;
+  border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface-tint);
   color: var(--primary);
@@ -82,9 +82,9 @@
 }
 
 .status-badge {
-  border-color: #cfe0d7;
+  border-color: var(--border);
   background: var(--surface-tint);
-  color: #617172;
+  color: var(--muted-foreground);
 }
 
 .shortcut-badge {
@@ -97,4 +97,3 @@
   overflow: auto;
   padding: 20px;
 }
-

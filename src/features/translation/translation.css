@@ -56,7 +56,8 @@
 }
 
 .input-textarea::placeholder {
-  color: rgba(115, 124, 123, 0.72);
+  color: var(--muted-foreground);
+  opacity: 0.7;
 }
 
 .ink-divider {
@@ -156,13 +157,12 @@
 }
 
 .history-card:hover {
-  border-color: #b7cbd4;
+  border-color: var(--border);
   background: var(--surface-tint) !important;
   box-shadow: none;
 }
 
 .history-card.is-active {
-  border-color: rgba(22, 97, 171, 0.34) !important;
-  background: rgba(22, 97, 171, 0.07) !important;
+  border-color: rgba(42, 96, 116, 0.34) !important;
+  background: rgba(42, 96, 116, 0.07) !important;
 }
-
