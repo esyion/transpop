@@ -25,7 +25,7 @@ export function AppHeader({
   onOpenCommandPalette,
 }: AppHeaderProps) {
   return (
-    <header className="app-header">
+    <header className="app-header" data-tauri-drag-region>
       <button
         type="button"
         onClick={() => onNavigate("translate")}
