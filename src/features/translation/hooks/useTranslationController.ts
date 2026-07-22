@@ -8,8 +8,27 @@ import { translator } from "../../../api/translator";
 import { writeClipboardText } from "../../../lib/clipboard";
 import { hasTauriRuntime } from "../../../lib/runtime";
 import { useAppStore } from "../../../store/appStore";
-import type { HistoryItem } from "../../../types/translation";
+import type {
+  HistoryItem,
+  TranslationSettings,
+} from "../../../types/translation";
 import { inferTargetLanguage } from "../utils/language";
+
+function createTranslationRequestKey(
+  text: string,
+  settings: TranslationSettings,
+  targetLanguage: string,
+): string {
+  return [
+    text,
+    settings.apiBaseUrl,
+    settings.apiMode,
+    settings.model,
+    targetLanguage,
+    settings.apiKeyConfigured,
+    settings.apiKey,
+  ].join("\u0000");
+}
 
 export function useTranslationController() {
   const translateRequestIdRef = useRef(0);
@@ -30,7 +49,7 @@ export function useTranslationController() {
   const setError = useAppStore((state) => state.setError);
   const setResult = useAppStore((state) => state.setResult);
   const clearResult = useAppStore((state) => state.clearResult);
-  const useHistoryItem = useAppStore((state) => state.useHistoryItem);
+  const restoreHistoryItem = useAppStore((state) => state.useHistoryItem);
   const setHistory = useAppStore((state) => state.setHistory);
 
   const effectiveTargetLanguage = useMemo(
@@ -44,6 +63,36 @@ export function useTranslationController() {
     : `Auto → ${effectiveTargetLanguage}`;
 
   const resetHistoryIndex = useCallback(() => setHistoryIndex(-1), []);
+
+  const restoreHistoryWithoutTranslating = useCallback(
+    (item: HistoryItem) => {
+      const text = item.input.trim();
+      if (text) {
+        lastTranslatedKeyRef.current = createTranslationRequestKey(
+          text,
+          settings,
+          inferTargetLanguage(text, settings),
+        );
+      }
+
+      // A history item already contains its translation. Invalidate any request
+      // still in flight and restore the saved result without scheduling it again.
+      translateRequestIdRef.current += 1;
+      setLoading(false);
+      restoreHistoryItem(item);
+    },
+    [restoreHistoryItem, setLoading, settings],
+  );
+
+  const selectHistoryItem = useCallback(
+    (item: HistoryItem) => {
+      setHistoryIndex(
+        history.findIndex((historyItem) => historyItem.id === item.id),
+      );
+      restoreHistoryWithoutTranslating(item);
+    },
+    [history, restoreHistoryWithoutTranslating],
+  );
 
   const markCopied = useCallback(() => {
     setCopied(true);
@@ -95,15 +144,11 @@ export function useTranslationController() {
         return;
       }
 
-      const requestKey = [
+      const requestKey = createTranslationRequestKey(
         text,
-        settings.apiBaseUrl,
-        settings.apiMode,
-        settings.model,
+        settings,
         effectiveTargetLanguage,
-        settings.apiKeyConfigured,
-        settings.apiKey,
-      ].join("\u0000");
+      );
       if (!force && requestKey === lastTranslatedKeyRef.current) return;
 
       const requestId = translateRequestIdRef.current + 1;
@@ -149,7 +194,6 @@ export function useTranslationController() {
         } else {
           toast.success("Translation ready");
         }
-        debugger;
       } catch (cause) {
         if (requestId !== translateRequestIdRef.current) return;
         console.error(cause);
@@ -215,9 +259,9 @@ export function useTranslationController() {
         history.length - 1,
       );
       setHistoryIndex(nextIndex);
-      useHistoryItem(history[nextIndex]);
+      restoreHistoryWithoutTranslating(history[nextIndex]);
     },
-    [history, historyIndex, useHistoryItem],
+    [history, historyIndex, restoreHistoryWithoutTranslating],
   );
 
   return {
@@ -235,7 +279,7 @@ export function useTranslationController() {
     languageHint,
     setInput,
     clearResult,
-    useHistoryItem,
+    useHistoryItem: selectHistoryItem,
     runTranslate,
     copyResult,
     retry,
