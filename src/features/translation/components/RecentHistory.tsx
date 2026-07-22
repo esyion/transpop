@@ -11,7 +11,7 @@ export function RecentHistory({ items, activeId, onUse }: RecentHistoryProps) {
 
   return (
     <div className="history-section">
-      <div className="history-heading">Recent translations</div>
+      <div className="history-heading">最近翻译</div>
       <div className="grid gap-2">
         {items.slice(0, 3).map((item) => (
           <button

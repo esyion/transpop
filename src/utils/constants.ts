@@ -1,4 +1,4 @@
-﻿import type { TranslationSettings } from "../types/translation";
+﻿import type { Language, ThemeMode, TranslationSettings } from "../types/translation";
 
 export const DEFAULT_SETTINGS: TranslationSettings = {
   apiBaseUrl: "https://api.openai.com/v1",
@@ -26,9 +26,29 @@ export const LANGUAGE_OPTIONS = [
   "Spanish",
 ] as const;
 
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  Chinese: "中文",
+  English: "英语",
+  Japanese: "日语",
+  Korean: "韩语",
+  French: "法语",
+  German: "德语",
+  Spanish: "西班牙语",
+};
+
+export function getLanguageLabel(language: string): string {
+  return LANGUAGE_LABELS[language as Language] ?? language;
+}
+
 export const API_MODE_OPTIONS = [
-  { value: "responses", label: "Responses" },
-  { value: "chat_completions", label: "Chat Completions" },
+  { value: "responses", label: "Responses API" },
+  { value: "chat_completions", label: "聊天补全 API" },
 ] as const;
 
 export const THEME_OPTIONS = ["system", "light", "dark"] as const;
+
+export const THEME_LABELS: Record<ThemeMode, string> = {
+  system: "跟随系统",
+  light: "浅色",
+  dark: "深色",
+};

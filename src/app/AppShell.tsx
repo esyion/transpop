@@ -46,7 +46,7 @@ export function AppShell() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.16, ease: "easeOut" }}
         className="app-window relative mx-auto flex w-full max-w-[920px] flex-col"
-        aria-label="TransPop translator"
+        aria-label="TransPop 翻译器"
       >
         <AppHeader
           languageHint={translation.languageHint}

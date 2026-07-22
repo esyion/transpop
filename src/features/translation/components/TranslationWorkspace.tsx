@@ -48,12 +48,12 @@ export function TranslationWorkspace({
       <div className="input-panel">
         <div className="panel-label-row">
           <span className="section-kicker">
-            <span className="mini-seal" aria-hidden="true" /> Source text
+            <span className="mini-seal" aria-hidden="true" /> 原文
           </span>
-          <span>Auto in 1s · Shift+Enter for newline</span>
+          <span>1 秒后自动翻译 · Shift+Enter 换行</span>
         </div>
         <label className="sr-only" htmlFor="translate-input">
-          Text to translate
+          待翻译文本
         </label>
         <Textarea
           id="translate-input"
@@ -61,7 +61,7 @@ export function TranslationWorkspace({
           value={input}
           onChange={(event) => onInputChange(event.currentTarget.value)}
           onKeyDown={onInputKeyDown}
-          placeholder="Paste or type text here..."
+          placeholder="在此粘贴或输入文本..."
           rows={2}
           spellCheck="false"
           className="input-textarea focus-visible:ring-0"

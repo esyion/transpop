@@ -12,6 +12,7 @@ import type {
   HistoryItem,
   TranslationSettings,
 } from "../../../types/translation";
+import { getLanguageLabel } from "../../../utils/constants";
 import { inferTargetLanguage } from "../utils/language";
 
 function createTranslationRequestKey(
@@ -59,8 +60,8 @@ export function useTranslationController() {
   const apiKeyMissing =
     !settings.apiKeyConfigured && settings.apiKey.trim().length === 0;
   const languageHint = result
-    ? `${result.sourceLanguage} → ${result.targetLanguage}`
-    : `Auto → ${effectiveTargetLanguage}`;
+    ? `${getLanguageLabel(String(result.sourceLanguage))} → ${getLanguageLabel(String(result.targetLanguage))}`
+    : `自动 → ${getLanguageLabel(effectiveTargetLanguage)}`;
 
   const resetHistoryIndex = useCallback(() => setHistoryIndex(-1), []);
 
@@ -140,7 +141,7 @@ export function useTranslationController() {
 
       if (apiKeyMissing) {
         setError(null);
-        if (force) toast.info("Add an API key to start translating.");
+        if (force) toast.info("请先添加 API 密钥。");
         return;
       }
 
@@ -190,16 +191,16 @@ export function useTranslationController() {
         if (settings.autoCopy) {
           await writeClipboardText(nextResult.result);
           markCopied();
-          toast.success("Translation copied");
+          toast.success("翻译结果已复制");
         } else {
-          toast.success("Translation ready");
+          toast.success("翻译完成");
         }
       } catch (cause) {
         if (requestId !== translateRequestIdRef.current) return;
         console.error(cause);
         const message = String(cause).includes("API key")
-          ? "Open Settings and add your API key."
-          : "Unable to translate. Retry or check your network.";
+          ? "请打开设置并添加 API 密钥。"
+          : "无法完成翻译，请重试或检查网络连接。";
         setError(message);
         toast.error(message);
       } finally {
@@ -237,7 +238,7 @@ export function useTranslationController() {
     if (!result?.result) return;
     await writeClipboardText(result.result);
     markCopied();
-    toast.success("Copied to clipboard");
+    toast.success("已复制到剪贴板");
   }, [markCopied, result?.result]);
 
   const retry = useCallback(

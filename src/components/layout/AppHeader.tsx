@@ -2,6 +2,7 @@
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import type { ViewMode } from "../../types/translation";
+import { getLanguageLabel } from "../../utils/constants";
 
 interface AppHeaderProps {
   languageHint: string;
@@ -30,7 +31,7 @@ export function AppHeader({
         type="button"
         onClick={() => onNavigate("translate")}
         className="brand-lockup outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label="Back to translate"
+        aria-label="返回翻译"
       >
         <span className="brand-mark" aria-hidden="true">
           <Languages size={18} />
@@ -43,20 +44,20 @@ export function AppHeader({
 
       <div className="header-tools">
         <Badge variant="secondary" className="status-badge hidden sm:inline-flex">
-          {smartTargetLanguage ? "Smart language" : effectiveTargetLanguage}
+          {smartTargetLanguage ? "智能翻译语言" : getLanguageLabel(effectiveTargetLanguage)}
         </Badge>
         <Badge
           className="shortcut-badge"
           variant={shortcutEnabled ? "outline" : "secondary"}
         >
-          {shortcutEnabled ? shortcut : "Shortcut off"}
+          {shortcutEnabled ? shortcut : "快捷键已关闭"}
         </Badge>
         <Button
           variant="ghost"
           size="iconSm"
           onClick={onOpenCommandPalette}
-          aria-label="Open command palette"
-          title="Command palette"
+          aria-label="打开命令面板"
+          title="命令面板"
         >
           <CommandIcon size={16} />
         </Button>
@@ -66,8 +67,8 @@ export function AppHeader({
           onClick={() =>
             onNavigate(view === "settings" ? "translate" : "settings")
           }
-          aria-label={view === "settings" ? "Close settings" : "Open settings"}
-          title="Settings"
+          aria-label={view === "settings" ? "关闭设置" : "打开设置"}
+          title="设置"
         >
           {view === "settings" ? <X size={16} /> : <Settings size={16} />}
         </Button>

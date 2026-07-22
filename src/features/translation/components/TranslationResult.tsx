@@ -38,10 +38,10 @@ export function TranslationResult({
       <Card className="result-card border-border/70">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-foreground/80">
-            <Languages size={15} /> Thinking...
+            <Languages size={15} /> 正在翻译...
           </CardTitle>
           <CardDescription>
-            Responding with lightweight skeleton feedback instead of a spinner.
+            正在生成翻译结果，请稍候。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -62,16 +62,15 @@ export function TranslationResult({
       <Card className="result-card border-primary/25">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-foreground">
-            Add API Key to start translating
+            请先添加 API 密钥
           </CardTitle>
           <CardDescription>
-            Your API key is encrypted before it is stored in the local SQLite
-            database.
+            API 密钥会先加密，再存储到本地 SQLite 数据库中。
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={onOpenSettings}>
-            <Settings size={15} /> Open Settings
+            <Settings size={15} /> 打开设置
           </Button>
         </CardContent>
       </Card>
@@ -83,16 +82,16 @@ export function TranslationResult({
       <Card className="result-card border-destructive/25">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold text-destructive">
-            Unable to translate.
+            翻译失败
           </CardTitle>
           <CardDescription>{error}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={onRetry} disabled={!canRetry}>
-            <RotateCcw size={15} /> Retry
+            <RotateCcw size={15} /> 重新翻译
           </Button>
           <Button variant="ghost" onClick={onOpenSettings}>
-            <Settings size={15} /> Open Settings
+            <Settings size={15} /> 打开设置
           </Button>
         </CardContent>
       </Card>
@@ -104,10 +103,10 @@ export function TranslationResult({
       <Card className="result-card empty-result border-border/70">
         <CardContent className="grid gap-1 py-10 text-sm">
           <strong className="text-base font-semibold text-foreground">
-            Start typing or paste text
+            输入或粘贴需要翻译的文本
           </strong>
           <p className="text-muted-foreground">
-            Translation will appear automatically after 1 second.
+            停止输入 1 秒后将自动显示翻译结果。
           </p>
         </CardContent>
       </Card>
@@ -118,15 +117,15 @@ export function TranslationResult({
     <Card className="result-card border-border/70">
       <CardHeader className="flex-row items-start justify-between gap-4 pb-3">
         <div className="space-y-1">
-          <CardTitle className="result-title text-foreground">Translation</CardTitle>
+          <CardTitle className="result-title text-foreground">翻译结果</CardTitle>
           <CardDescription>
             {autoCopy
-              ? "Copied automatically. Retry if you need a refreshed result."
-              : "Copy or retry without leaving the workflow."}
+              ? "已自动复制。需要更新结果时可重新翻译。"
+              : "可以直接复制或重新翻译。"}
           </CardDescription>
         </div>
         <Button variant="ghost" size="sm" onClick={onRetry} disabled={!canRetry}>
-          <RotateCcw size={15} /> Retry
+          <RotateCcw size={15} /> 重新翻译
         </Button>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -134,13 +133,13 @@ export function TranslationResult({
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={onCopy}>
             {copied ? <Check size={15} /> : <Copy size={15} />}
-            {copied ? "Copied" : "Copy"}
+            {copied ? "已复制" : "复制"}
           </Button>
           <Button variant="ghost" onClick={onRetry} disabled={!canRetry}>
-            <RotateCcw size={15} /> Retry
+            <RotateCcw size={15} /> 重新翻译
           </Button>
           <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground">
-            <ArrowUpDown size={13} /> History ↑ ↓
+            <ArrowUpDown size={13} /> 上下键切换历史
           </span>
         </div>
       </CardContent>

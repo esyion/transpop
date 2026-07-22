@@ -18,13 +18,13 @@ import {
 } from "lucide-react";
 
 export const commandItems = [
-  { label: "Translate now", hint: "Enter", action: "translate", icon: Sparkles },
-  { label: "Copy result", hint: "Ctrl/Cmd + C", action: "copy", icon: Copy },
-  { label: "Retry", hint: "R", action: "retry", icon: RotateCcw },
-  { label: "Open settings", hint: "S", action: "settings", icon: Settings },
-  { label: "Clear input", hint: "⌫", action: "clear", icon: X },
+  { label: "立即翻译", hint: "回车", action: "translate", icon: Sparkles },
+  { label: "复制结果", hint: "Ctrl/Cmd + C", action: "copy", icon: Copy },
+  { label: "重新翻译", hint: "R", action: "retry", icon: RotateCcw },
+  { label: "打开设置", hint: "S", action: "settings", icon: Settings },
+  { label: "清空输入", hint: "⌫", action: "clear", icon: X },
   {
-    label: "Back to translate",
+    label: "返回翻译",
     hint: "Esc",
     action: "translate-view",
     icon: Languages,
@@ -61,26 +61,26 @@ export function CommandPalette({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 8 }}
             transition={{ duration: 0.12, ease: "easeOut" }}
-            className="command-palette mx-auto w-full max-w-[640px]"
+            className="command-palette mx-auto w-full max-w-160"
           >
             <CommandMenu className="w-full bg-transparent text-popover-foreground">
               <div className="flex items-center gap-2 border-b border-border/70 px-4 py-3 text-muted-foreground">
                 <Search size={16} />
                 <CommandInput
                   autoFocus
-                  placeholder="Search actions..."
+                  placeholder="搜索命令..."
                   className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
                   onKeyDown={(event) => {
                     if (event.key === "Escape") onOpenChange(false);
                   }}
                 />
               </div>
-              <CommandList className="max-h-[320px] overflow-auto p-2">
+              <CommandList className="max-h-80 overflow-auto p-2">
                 <CommandEmpty className="px-3 py-8 text-center text-sm text-muted-foreground">
-                  No actions found.
+                  未找到匹配的命令。
                 </CommandEmpty>
                 <CommandGroup
-                  heading="Actions"
+                  heading="命令"
                   className="px-1 py-1 text-xs text-muted-foreground"
                 >
                   {commandItems.map(({ label, hint, action, icon: Icon }) => (
@@ -88,7 +88,7 @@ export function CommandPalette({
                       key={action}
                       value={label}
                       onSelect={() => onExecute(action)}
-                      className="flex cursor-pointer items-center justify-between gap-4 rounded-[12px] px-3 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-foreground"
+                      className="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-foreground"
                     >
                       <span className="flex items-center gap-3">
                         <Icon size={16} className="text-muted-foreground" />
