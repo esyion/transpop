@@ -21,6 +21,13 @@ pub fn run() {
         .build();
 
     tauri::Builder::default()
+        // This plugin must be registered first so a second launch is stopped
+        // before it can initialize its own window, shortcuts, or tray icon.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Err(err) = window::show_main(app) {
+                eprintln!("failed to show main window from second instance: {err}");
+            }
+        }))
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(global_shortcut_plugin)
