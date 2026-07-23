@@ -73,7 +73,6 @@ export function AppShell() {
                 translation.history[translation.historyIndex]?.id
               }
               copied={translation.copied}
-              autoCopy={translation.settings.autoCopy}
               apiKeyMissing={translation.apiKeyMissing}
               onInputChange={(value) => {
                 translation.setInput(value);

@@ -1,4 +1,4 @@
-﻿import { ArrowUpDown, Check, Copy, Languages, RotateCcw, Settings } from "lucide-react";
+﻿import { Check, Copy, Languages, RotateCcw, Settings } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -14,7 +14,6 @@ interface TranslationResultProps {
   resultText: string;
   canRetry: boolean;
   copied: boolean;
-  autoCopy: boolean;
   apiKeyMissing: boolean;
   onCopy: () => void;
   onRetry: () => void;
@@ -27,7 +26,6 @@ export function TranslationResult({
   resultText,
   canRetry,
   copied,
-  autoCopy,
   apiKeyMissing,
   onCopy,
   onRetry,

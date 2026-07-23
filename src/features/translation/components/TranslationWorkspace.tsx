@@ -3,7 +3,6 @@ import { Separator } from "../../../components/ui/separator";
 import { Textarea } from "../../../components/ui/textarea";
 import type { HistoryItem } from "../../../types/translation";
 import { RecentHistory } from "./RecentHistory";
-import { ShortcutStrip } from "./ShortcutStrip";
 import { TranslationResult } from "./TranslationResult";
 
 interface TranslationWorkspaceProps {
@@ -15,7 +14,6 @@ interface TranslationWorkspaceProps {
   history: HistoryItem[];
   activeHistoryId?: string;
   copied: boolean;
-  autoCopy: boolean;
   apiKeyMissing: boolean;
   onInputChange: (value: string) => void;
   onInputKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void;
@@ -37,7 +35,6 @@ export function TranslationWorkspace({
   history,
   activeHistoryId,
   copied,
-  autoCopy,
   apiKeyMissing,
   onInputChange,
   onInputKeyDown,
@@ -81,7 +78,6 @@ export function TranslationWorkspace({
         resultText={resultText}
         canRetry={input.trim().length > 0 && !apiKeyMissing}
         copied={copied}
-        autoCopy={autoCopy}
         apiKeyMissing={apiKeyMissing && input.trim().length > 0}
         onCopy={onCopy}
         onRetry={onRetry}
