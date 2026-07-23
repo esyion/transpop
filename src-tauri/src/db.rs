@@ -144,6 +144,26 @@ pub fn list_recent_history<R: Runtime>(app: AppHandle<R>, limit: Option<i64>) ->
     list_recent_history_from_conn(&conn, limit.unwrap_or(3))
 }
 
+#[tauri::command]
+pub fn delete_history_item<R: Runtime>(app: AppHandle<R>, id: String) -> Result<(), String> {
+    let conn = connection(&app)?;
+    migrate(&conn)?;
+    let id = id.trim();
+    if id.is_empty() {
+        return Err("history id is empty".to_string());
+    }
+
+    let deleted = conn
+        .execute("DELETE FROM translation_history WHERE id = ?1", params![id])
+        .map_err(|err| err.to_string())?;
+
+    if deleted == 0 {
+        return Err("history item not found".to_string());
+    }
+
+    Ok(())
+}
+
 pub fn get_decrypted_api_key<R: Runtime>(app: &AppHandle<R>) -> Result<Option<String>, String> {
     let conn = connection(app)?;
     migrate(&conn)?;

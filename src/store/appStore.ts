@@ -21,6 +21,7 @@ interface AppState {
   useHistoryItem: (item: HistoryItem) => void;
   setSettings: (settings: TranslationSettings) => void;
   setHistory: (history: HistoryItem[]) => void;
+  removeHistoryItem: (id: string) => void;
   setShortcutError: (error: string | null) => void;
 }
 
@@ -71,5 +72,9 @@ export const useAppStore = create<AppState>((set) => ({
     }),
   setSettings: (settings) => set({ settings }),
   setHistory: (history) => set({ history: history.slice(0, MAX_HISTORY) }),
+  removeHistoryItem: (id) =>
+    set((state) => ({
+      history: state.history.filter((item) => item.id !== id),
+    })),
   setShortcutError: (shortcutError) => set({ shortcutError }),
 }));

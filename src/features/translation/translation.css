@@ -181,6 +181,18 @@
   background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
 }
 
+.history-card-body {
+  min-width: 0;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.history-card-body:focus-visible {
+  outline: none;
+}
+
 .history-card .history-input {
   color: var(--text-primary);
   font-weight: var(--font-weight-medium);
@@ -189,4 +201,11 @@
 .history-card .history-output {
   color: var(--muted-foreground);
   font-weight: var(--font-weight-regular);
+}
+
+.history-delete-btn {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }

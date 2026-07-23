@@ -37,6 +37,21 @@ export async function loadRecentHistory(limit = 3): Promise<HistoryItem[]> {
   return invoke<HistoryItem[]>("list_recent_history", { limit });
 }
 
+export async function deleteHistoryItem(id: string): Promise<void> {
+  const historyId = id.trim();
+  if (!historyId) return;
+
+  if (!hasTauriRuntime()) {
+    const raw = window.localStorage.getItem(HISTORY_KEY);
+    const items: HistoryItem[] = raw ? JSON.parse(raw) : [];
+    const next = items.filter((item) => item.id !== historyId);
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next.slice(0, 100)));
+    return;
+  }
+
+  await invoke("delete_history_item", { id: historyId });
+}
+
 export function saveBrowserHistory(items: HistoryItem[]): void {
   if (!hasTauriRuntime()) {
     window.localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 100)));

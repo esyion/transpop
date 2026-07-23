@@ -83,6 +83,7 @@ export function AppShell() {
               onRetry={translation.retry}
               onOpenSettings={() => setView("settings")}
               onUseHistory={translation.useHistoryItem}
+              onDeleteHistory={(item) => void translation.removeHistoryItem(item)}
             />
           }
           settings={<SettingsPanel />}

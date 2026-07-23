@@ -1,6 +1,7 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
+  deleteHistoryItem,
   loadRecentHistory,
   saveBrowserHistory,
 } from "../../../api/settingsStore";
@@ -52,6 +53,9 @@ export function useTranslationController() {
   const clearResult = useAppStore((state) => state.clearResult);
   const restoreHistoryItem = useAppStore((state) => state.useHistoryItem);
   const setHistory = useAppStore((state) => state.setHistory);
+  const removeHistoryItemFromStore = useAppStore(
+    (state) => state.removeHistoryItem,
+  );
 
   const effectiveTargetLanguage = useMemo(
     () => inferTargetLanguage(input, settings),
@@ -93,6 +97,39 @@ export function useTranslationController() {
       restoreHistoryWithoutTranslating(item);
     },
     [history, restoreHistoryWithoutTranslating],
+  );
+
+  const removeHistoryItem = useCallback(
+    async (item: HistoryItem) => {
+      try {
+        await deleteHistoryItem(item.id);
+
+        setHistoryIndex((currentIndex) => {
+          if (currentIndex < 0) return currentIndex;
+          const removedIndex = history.findIndex(
+            (historyItem) => historyItem.id === item.id,
+          );
+          if (removedIndex < 0) return currentIndex;
+          if (removedIndex === currentIndex) return -1;
+          if (removedIndex < currentIndex) return currentIndex - 1;
+          return currentIndex;
+        });
+
+        // Prefer reloading so older items can fill the recent list after a delete.
+        try {
+          const loaded = await loadRecentHistory(3);
+          setHistory(loaded);
+        } catch {
+          removeHistoryItemFromStore(item.id);
+        }
+
+        toast.success("已删除历史记录");
+      } catch (cause) {
+        console.error(cause);
+        toast.error("删除历史记录失败");
+      }
+    },
+    [history, removeHistoryItemFromStore, setHistory],
   );
 
   const markCopied = useCallback(() => {
@@ -281,6 +318,7 @@ export function useTranslationController() {
     setInput,
     clearResult,
     useHistoryItem: selectHistoryItem,
+    removeHistoryItem,
     runTranslate,
     copyResult,
     retry,

@@ -23,6 +23,7 @@ interface TranslationWorkspaceProps {
   onRetry: () => void;
   onOpenSettings: () => void;
   onUseHistory: (item: HistoryItem) => void;
+  onDeleteHistory: (item: HistoryItem) => void;
 }
 
 export function TranslationWorkspace({
@@ -42,6 +43,7 @@ export function TranslationWorkspace({
   onRetry,
   onOpenSettings,
   onUseHistory,
+  onDeleteHistory,
 }: TranslationWorkspaceProps) {
   return (
     <div className="translation-layout grid gap-4">
@@ -86,6 +88,7 @@ export function TranslationWorkspace({
       <RecentHistory
         items={history}
         onUse={onUseHistory}
+        onDelete={onDeleteHistory}
         activeId={activeHistoryId}
       />
 
