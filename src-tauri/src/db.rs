@@ -164,6 +164,15 @@ pub fn delete_history_item<R: Runtime>(app: AppHandle<R>, id: String) -> Result<
     Ok(())
 }
 
+#[tauri::command]
+pub fn clear_all_history<R: Runtime>(app: AppHandle<R>) -> Result<(), String> {
+    let conn = connection(&app)?;
+    migrate(&conn)?;
+    conn.execute("DELETE FROM translation_history", [])
+        .map_err(|err| err.to_string())?;
+    Ok(())
+}
+
 pub fn get_decrypted_api_key<R: Runtime>(app: &AppHandle<R>) -> Result<Option<String>, String> {
     let conn = connection(app)?;
     migrate(&conn)?;

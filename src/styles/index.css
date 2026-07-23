@@ -3,6 +3,7 @@
 @import "./base.css";
 @import "./layout.css";
 @import "../features/translation/translation.css";
+@import "../features/history/history.css";
 @import "../features/settings/settings.css";
 @import "../features/command-palette/command-palette.css";
 @import "./responsive.css";

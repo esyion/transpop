@@ -7,6 +7,7 @@ import { useDesktopWindow } from "./hooks/useDesktopWindow";
 import { AppContent } from "../components/layout/AppContent";
 import { AppHeader } from "../components/layout/AppHeader";
 import { CommandPalette } from "../features/command-palette/CommandPalette";
+import { HistoryPanel } from "../features/history/components/HistoryPanel";
 import { SettingsPanel } from "../features/settings/components/SettingsPanel";
 import { TranslationWorkspace } from "../features/translation/components/TranslationWorkspace";
 import { useTranslationController } from "../features/translation/hooks/useTranslationController";
@@ -83,10 +84,23 @@ export function AppShell() {
               onRetry={translation.retry}
               onOpenSettings={() => setView("settings")}
               onUseHistory={translation.useHistoryItem}
-              onDeleteHistory={(item) => void translation.removeHistoryItem(item)}
+              onDeleteHistory={(item) =>
+                void translation.removeHistoryItem(item)
+              }
+              onViewAllHistory={() => setView("history")}
+              historyTotalCount={translation.history.length}
             />
           }
           settings={<SettingsPanel />}
+          history={
+            <HistoryPanel
+              items={translation.history}
+              onUse={translation.useHistoryItem}
+              onDelete={(item) => void translation.removeHistoryItem(item)}
+              onClearAll={() => void translation.clearHistory()}
+              onBack={() => setView("translate")}
+            />
+          }
         />
       </motion.section>
 

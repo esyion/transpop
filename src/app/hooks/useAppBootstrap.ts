@@ -27,7 +27,7 @@ export function useAppBootstrap(): void {
   useEffect(() => {
     let cancelled = false;
 
-    void Promise.all([loadSettings(), loadRecentHistory(3)]).then(
+    void Promise.all([loadSettings(), loadRecentHistory()]).then(
       ([storedSettings, recentHistory]) => {
         if (cancelled) return;
         setSettings(storedSettings);

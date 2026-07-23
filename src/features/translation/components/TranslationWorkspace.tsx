@@ -24,6 +24,8 @@ interface TranslationWorkspaceProps {
   onOpenSettings: () => void;
   onUseHistory: (item: HistoryItem) => void;
   onDeleteHistory: (item: HistoryItem) => void;
+  onViewAllHistory?: () => void;
+  historyTotalCount?: number;
 }
 
 export function TranslationWorkspace({
@@ -44,6 +46,8 @@ export function TranslationWorkspace({
   onOpenSettings,
   onUseHistory,
   onDeleteHistory,
+  onViewAllHistory,
+  historyTotalCount,
 }: TranslationWorkspaceProps) {
   return (
     <div className="translation-layout grid gap-4">
@@ -52,7 +56,6 @@ export function TranslationWorkspace({
           <span className="section-kicker">
             <span className="mini-seal" aria-hidden="true" /> 原文
           </span>
-          <span>1 秒后自动翻译 · Shift+Enter 换行</span>
         </div>
         <label className="sr-only" htmlFor="translate-input">
           待翻译文本
@@ -90,6 +93,8 @@ export function TranslationWorkspace({
         onUse={onUseHistory}
         onDelete={onDeleteHistory}
         activeId={activeHistoryId}
+        onViewAll={onViewAllHistory}
+        totalCount={historyTotalCount}
       />
 
       {/* <ShortcutStrip /> */}

@@ -41,7 +41,7 @@ export function TranslationResult({
             <Languages size={15} /> 正在翻译...
           </CardTitle>
           <CardDescription>
-            正在生成翻译结果，请稍候。
+            正在生成翻译结果，请稍候
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -65,7 +65,7 @@ export function TranslationResult({
             请先添加 API 密钥
           </CardTitle>
           <CardDescription>
-            API 密钥会先加密，再存储到本地 SQLite 数据库中。
+            API 密钥会先加密，再存储到本地 SQLite 数据库中
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,7 +106,7 @@ export function TranslationResult({
             输入或粘贴需要翻译的文本
           </strong>
           <p className="text-xs font-normal leading-normal text-muted-foreground">
-            停止输入 1 秒后将自动显示翻译结果。
+            自动显示翻译结果
           </p>
         </CardContent>
       </Card>
@@ -118,11 +118,6 @@ export function TranslationResult({
       <CardHeader className="flex-row items-start justify-between gap-4 pb-3">
         <div className="space-y-1">
           <CardTitle className="result-title text-foreground">翻译结果</CardTitle>
-          {/* <CardDescription>
-            {autoCopy
-              ? "已自动复制。需要更新结果时可重新翻译。"
-              : "可以直接复制或重新翻译。"}
-          </CardDescription> */}
         </div>
         <Button variant="ghost" size="sm" onClick={onRetry} disabled={!canRetry}>
           <RotateCcw size={15} /> 重新翻译

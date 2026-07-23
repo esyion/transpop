@@ -28,7 +28,12 @@ export async function saveSettings(settings: TranslationSettings): Promise<Trans
   return { ...DEFAULT_SETTINGS, ...saved, apiKey: "" };
 }
 
-export async function loadRecentHistory(limit = 3): Promise<HistoryItem[]> {
+/** Max history rows kept by backend and browser storage. */
+export const MAX_HISTORY_ITEMS = 100;
+
+export async function loadRecentHistory(
+  limit = MAX_HISTORY_ITEMS,
+): Promise<HistoryItem[]> {
   if (!hasTauriRuntime()) {
     const raw = window.localStorage.getItem(HISTORY_KEY);
     return raw ? JSON.parse(raw).slice(0, limit) : [];
@@ -45,15 +50,30 @@ export async function deleteHistoryItem(id: string): Promise<void> {
     const raw = window.localStorage.getItem(HISTORY_KEY);
     const items: HistoryItem[] = raw ? JSON.parse(raw) : [];
     const next = items.filter((item) => item.id !== historyId);
-    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(next.slice(0, 100)));
+    window.localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(next.slice(0, MAX_HISTORY_ITEMS)),
+    );
     return;
   }
 
   await invoke("delete_history_item", { id: historyId });
 }
 
+export async function clearAllHistory(): Promise<void> {
+  if (!hasTauriRuntime()) {
+    window.localStorage.setItem(HISTORY_KEY, JSON.stringify([]));
+    return;
+  }
+
+  await invoke("clear_all_history");
+}
+
 export function saveBrowserHistory(items: HistoryItem[]): void {
   if (!hasTauriRuntime()) {
-    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 100)));
+    window.localStorage.setItem(
+      HISTORY_KEY,
+      JSON.stringify(items.slice(0, MAX_HISTORY_ITEMS)),
+    );
   }
 }

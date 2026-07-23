@@ -1,7 +1,7 @@
 ﻿export type ApiMode = "responses" | "chat_completions";
 export type ThemeMode = "system" | "light" | "dark";
 export type Language = "Chinese" | "English" | "Japanese" | "Korean" | "French" | "German" | "Spanish";
-export type ViewMode = "translate" | "settings";
+export type ViewMode = "translate" | "settings" | "history";
 
 export interface TranslationResult {
   sourceLanguage: Language | string;

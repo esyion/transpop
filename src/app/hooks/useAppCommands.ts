@@ -40,7 +40,7 @@ export function useAppCommands({
 
     switch (action) {
       case "translate":
-        if (view === "settings") {
+        if (view !== "translate") {
           setView("translate");
           return;
         }
@@ -54,6 +54,9 @@ export function useAppCommands({
         return;
       case "settings":
         setView("settings");
+        return;
+      case "history":
+        setView("history");
         return;
       case "clear":
         clearInput();
@@ -95,7 +98,7 @@ export function useAppCommands({
         setPaletteOpen(false);
         return;
       }
-      if (view === "settings") {
+      if (view === "settings" || view === "history") {
         setView("translate");
         return;
       }

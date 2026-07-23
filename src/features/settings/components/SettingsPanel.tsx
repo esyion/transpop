@@ -58,7 +58,7 @@ export function SettingsPanel() {
         <SettingGroup
           icon={<PlugZap size={17} />}
           title="大模型接口"
-          description="支持兼容 OpenAI 的接口，目前可使用 Responses 和聊天补全接口。"
+          description="支持兼容 OpenAI 的接口，目前可使用 Responses 和聊天补全接口"
         >
           <Field label="接口地址">
             <Input
@@ -158,7 +158,7 @@ export function SettingsPanel() {
           </div>
         </SettingGroup>
 
-        <SettingGroup icon={<Power size={17} />} title="使用习惯" description="调整自动复制和开机启动等常用行为。">
+        <SettingGroup icon={<Power size={17} />} title="使用习惯" description="调整自动复制和开机启动等常用行为">
           <SwitchRow
             label="自动复制翻译结果"
             checked={settings.autoCopy}
@@ -189,11 +189,11 @@ export function SettingsPanel() {
             </Button>
           </div>
           {shortcutError && (
-            <p className="setting-help text-destructive">快捷键注册失败，可尝试 Ctrl + Alt + T。</p>
+            <p className="setting-help text-destructive">快捷键注册失败，可尝试 Ctrl + Alt + T</p>
           )}
         </SettingGroup>
 
-        <SettingGroup icon={<Type size={17} />} title="字体大小" description="根据阅读习惯调整界面字体缩放比例。">
+        <SettingGroup icon={<Type size={17} />} title="字体大小" description="根据阅读习惯调整界面字体缩放比例">
           <Field label={`缩放 ${settings.fontScale.toFixed(2)}×`}>
             <input
               className="w-full accent-primary"

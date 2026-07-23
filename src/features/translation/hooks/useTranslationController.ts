@@ -1,8 +1,10 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
+  clearAllHistory,
   deleteHistoryItem,
   loadRecentHistory,
+  MAX_HISTORY_ITEMS,
   saveBrowserHistory,
 } from "../../../api/settingsStore";
 import { translator } from "../../../api/translator";
@@ -56,6 +58,7 @@ export function useTranslationController() {
   const removeHistoryItemFromStore = useAppStore(
     (state) => state.removeHistoryItem,
   );
+  const clearHistoryFromStore = useAppStore((state) => state.clearHistory);
 
   const effectiveTargetLanguage = useMemo(
     () => inferTargetLanguage(input, settings),
@@ -115,9 +118,9 @@ export function useTranslationController() {
           return currentIndex;
         });
 
-        // Prefer reloading so older items can fill the recent list after a delete.
+        // Prefer reloading so remaining items stay in sync with storage.
         try {
-          const loaded = await loadRecentHistory(3);
+          const loaded = await loadRecentHistory(MAX_HISTORY_ITEMS);
           setHistory(loaded);
         } catch {
           removeHistoryItemFromStore(item.id);
@@ -131,6 +134,18 @@ export function useTranslationController() {
     },
     [history, removeHistoryItemFromStore, setHistory],
   );
+
+  const clearHistory = useCallback(async () => {
+    try {
+      await clearAllHistory();
+      clearHistoryFromStore();
+      setHistoryIndex(-1);
+      toast.success("已清空全部历史记录");
+    } catch (cause) {
+      console.error(cause);
+      toast.error("清空历史记录失败");
+    }
+  }, [clearHistoryFromStore]);
 
   const markCopied = useCallback(() => {
     setCopied(true);
@@ -153,7 +168,7 @@ export function useTranslationController() {
     async (fallbackHistory?: HistoryItem[]) => {
       if (hasTauriRuntime()) {
         try {
-          const loaded = await loadRecentHistory(3);
+          const loaded = await loadRecentHistory(MAX_HISTORY_ITEMS);
           setHistory(loaded);
         } catch {
           console.warn("Failed to load recent history");
@@ -178,7 +193,7 @@ export function useTranslationController() {
 
       if (apiKeyMissing) {
         setError(null);
-        if (force) toast.info("请先添加 API 密钥。");
+        if (force) toast.info("请先添加 API 密钥");
         return;
       }
 
@@ -219,7 +234,10 @@ export function useTranslationController() {
         // Check again if request is still valid before updating history
         if (requestId !== translateRequestIdRef.current) return;
 
-        const nextHistory = [nextHistoryItem, ...history].slice(0, 3);
+        const nextHistory = [nextHistoryItem, ...history].slice(
+          0,
+          MAX_HISTORY_ITEMS,
+        );
         await refreshRecentHistory(nextHistory);
 
         // Check again after async history refresh
@@ -236,8 +254,8 @@ export function useTranslationController() {
         if (requestId !== translateRequestIdRef.current) return;
         console.error(cause);
         const message = String(cause).includes("API key")
-          ? "请打开设置并添加 API 密钥。"
-          : "无法完成翻译，请重试或检查网络连接。";
+          ? "请打开设置并添加 API 密钥"
+          : "无法完成翻译，请重试或检查网络连接";
         setError(message);
         toast.error(message);
       } finally {
@@ -319,6 +337,7 @@ export function useTranslationController() {
     clearResult,
     useHistoryItem: selectHistoryItem,
     removeHistoryItem,
+    clearHistory,
     runTranslate,
     copyResult,
     retry,

@@ -9,6 +9,7 @@ import {
 } from "cmdk";
 import {
   Copy,
+  History,
   Languages,
   RotateCcw,
   Search,
@@ -21,6 +22,7 @@ export const commandItems = [
   { label: "立即翻译", hint: "回车", action: "translate", icon: Sparkles },
   { label: "复制结果", hint: "Ctrl/Cmd + C", action: "copy", icon: Copy },
   { label: "重新翻译", hint: "R", action: "retry", icon: RotateCcw },
+  { label: "翻译历史", hint: "H", action: "history", icon: History },
   { label: "打开设置", hint: "S", action: "settings", icon: Settings },
   { label: "清空输入", hint: "⌫", action: "clear", icon: X },
   {
@@ -77,7 +79,7 @@ export function CommandPalette({
               </div>
               <CommandList className="max-h-80 overflow-auto p-2">
                 <CommandEmpty className="px-3 py-8 text-center text-sm font-normal text-muted-foreground">
-                  未找到匹配的命令。
+                  未找到匹配的命令
                 </CommandEmpty>
                 <CommandGroup
                   heading="命令"

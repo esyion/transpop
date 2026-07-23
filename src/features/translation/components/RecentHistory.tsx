@@ -6,6 +6,8 @@ interface RecentHistoryProps {
   activeId?: string;
   onUse: (item: HistoryItem) => void;
   onDelete: (item: HistoryItem) => void;
+  onViewAll?: () => void;
+  totalCount?: number;
 }
 
 export function RecentHistory({
@@ -13,12 +15,30 @@ export function RecentHistory({
   activeId,
   onUse,
   onDelete,
+  onViewAll,
+  totalCount,
 }: RecentHistoryProps) {
   if (items.length === 0) return null;
 
+  const showViewAll =
+    typeof onViewAll === "function" &&
+    typeof totalCount === "number" &&
+    totalCount > items.length;
+
   return (
     <div className="history-section">
-      <div className="history-heading">最近翻译</div>
+      <div className="history-heading-row">
+        <div className="history-heading">最近翻译</div>
+        {onViewAll ? (
+          <button
+            type="button"
+            className="history-view-all"
+            onClick={onViewAll}
+          >
+            {showViewAll ? `查看全部 ${totalCount} 条` : "查看全部"}
+          </button>
+        ) : null}
+      </div>
       <div className="grid gap-2">
         {items.slice(0, 3).map((item) => (
           <div

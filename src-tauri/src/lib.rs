@@ -74,6 +74,7 @@ pub fn run() {
             db::save_app_settings,
             db::list_recent_history,
             db::delete_history_item,
+            db::clear_all_history,
             translate::translate,
             window::show_main_window,
             window::hide_main_window,

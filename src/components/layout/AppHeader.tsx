@@ -1,4 +1,10 @@
-﻿import { Command as CommandIcon, Languages, Settings, X } from "lucide-react";
+﻿import {
+  Command as CommandIcon,
+  History,
+  Languages,
+  Settings,
+  X,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import type { ViewMode } from "../../types/translation";
@@ -26,7 +32,7 @@ export function AppHeader({
   onOpenCommandPalette,
 }: AppHeaderProps) {
   return (
-    <header className="app-header" >
+    <header className="app-header">
       <button
         type="button"
         onClick={() => onNavigate("translate")}
@@ -44,7 +50,9 @@ export function AppHeader({
 
       <div className="header-tools">
         <Badge variant="secondary" className="status-badge hidden sm:inline-flex">
-          {smartTargetLanguage ? "自动" : getLanguageLabel(effectiveTargetLanguage)}
+          {smartTargetLanguage
+            ? "自动"
+            : getLanguageLabel(effectiveTargetLanguage)}
         </Badge>
         <Badge
           className="shortcut-badge"
@@ -60,6 +68,17 @@ export function AppHeader({
           title="命令面板"
         >
           <CommandIcon size={16} />
+        </Button>
+        <Button
+          variant={view === "history" ? "accent" : "ghost"}
+          size="iconSm"
+          onClick={() =>
+            onNavigate(view === "history" ? "translate" : "history")
+          }
+          aria-label={view === "history" ? "关闭历史" : "打开历史"}
+          title="翻译历史"
+        >
+          {view === "history" ? <X size={16} /> : <History size={16} />}
         </Button>
         <Button
           variant="ghost"
