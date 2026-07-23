@@ -1,4 +1,4 @@
-﻿.settings-layout {
+.settings-layout {
   display: grid;
   gap: 14px;
 }
@@ -22,5 +22,23 @@
 .setting-row {
   border-radius: 9px !important;
   background: var(--surface-soft) !important;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
 }
 
+.setting-field-label {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.setting-help {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}

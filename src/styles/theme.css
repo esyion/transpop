@@ -1,4 +1,4 @@
-﻿@theme inline {
+@theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -16,86 +16,171 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+
+  /* Typography scale — single source of truth */
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+
+  --text-xs: var(--font-size-xs);
+  --text-xs--line-height: var(--line-height-tight);
+  --text-sm: var(--font-size-sm);
+  --text-sm--line-height: var(--line-height-normal);
+  --text-base: var(--font-size-base);
+  --text-base--line-height: var(--line-height-normal);
+  --text-lg: var(--font-size-lg);
+  --text-lg--line-height: var(--line-height-relaxed);
+  --text-xl: var(--font-size-xl);
+  --text-xl--line-height: var(--line-height-snug);
 }
 
 :root {
   --font-scale: 1;
 
-  /* 青花瓷配色 — 浅色主题：卵白底色 + 霁蓝主调 */
-  --background: #f8f6f1;
-  --foreground: #1c2b38;
-  --card: #fefcf8;
-  --card-foreground: #1c2b38;
-  --popover: #fefcf8;
-  --popover-foreground: #1c2b38;
-  --muted: #edeae2;
-  --muted-foreground: #6e7f86;
-  --border: #cddde6;
-  --input: #bdd1db;
-  --ring: rgba(42, 96, 116, 0.3);
+  /*
+   * Font stack
+   * Latin: system UI first (Segoe UI / SF Pro / Inter)
+   * CJK: platform-native Chinese faces after Latin for mixed text
+   */
+  --font-family-sans:
+    "Segoe UI Variable",
+    "Segoe UI",
+    "SF Pro Text",
+    "SF Pro Display",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "PingFang SC",
+    "Microsoft YaHei UI",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    "Noto Sans CJK SC",
+    "Source Han Sans SC",
+    sans-serif;
+
+  --font-family-mono:
+    "Cascadia Code",
+    "Segoe UI Mono",
+    "SF Mono",
+    ui-monospace,
+    "Cascadia Mono",
+    "Menlo",
+    "Consolas",
+    monospace;
+
+  /*
+   * Type scale (px values × --font-scale via rem on body)
+   * xs   12  — hint / badge / meta
+   * sm   13  — secondary label / caption
+   * base 14  — UI body / button / description
+   * md   15  — section title / brand
+   * lg   17  — input & translation result (primary content)
+   * xl   20  — rare display (empty-state hero)
+   */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.8125rem;  /* 13px */
+  --font-size-base: 0.875rem; /* 14px */
+  --font-size-md: 0.9375rem;  /* 15px */
+  --font-size-lg: 1.0625rem;  /* 17px */
+  --font-size-xl: 1.25rem;    /* 20px */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --line-height-tight: 1.35;
+  --line-height-snug: 1.4;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+
+  /* 青花瓷配色 — 浅色：卵白底 + 霁蓝主调 */
+  --background: #f7f5f0;
+  --foreground: #1a2834;
+  --card: #fefdfb;
+  --card-foreground: #1a2834;
+  --popover: #fefdfb;
+  --popover-foreground: #1a2834;
+  --muted: #ebe8e0;
+  --muted-foreground: #5c6d78;
+  --border: #c8d8e2;
+  --input: #b7ccd8;
+  --ring: rgba(42, 96, 116, 0.32);
   --primary: #2a6074;
-  --primary-foreground: #f8f6f1;
-  --accent: #e8f4f8;
-  --accent-foreground: #1c2b38;
+  --primary-foreground: #f7f5f0;
+  --accent: #e6f2f7;
+  --accent-foreground: #1a2834;
   --destructive: #b84050;
-  --destructive-foreground: #f8f6f1;
-  --surface-soft: #edeae2;
-  --surface-tint: #e8f4f8;
-  --shadow-soft: rgba(28, 43, 56, 0.08);
+  --destructive-foreground: #f7f5f0;
+  --surface-soft: #ebe8e0;
+  --surface-tint: #e6f2f7;
+  --shadow-soft: rgba(26, 40, 52, 0.08);
+
+  /* Text hierarchy helpers (opacity on foreground ink) */
+  --text-primary: var(--foreground);
+  --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
+  --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
+  --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
 
   color-scheme: light;
-  font-family: "Microsoft YaHei UI", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  font-family: var(--font-family-sans);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    /* 跟随系统深色偏好时，使用暗色主题 */
-    --background: #192231;
-    --foreground: #eef2f0;
-    --card: #243044;
-    --card-foreground: #eef2f0;
-    --popover: #243044;
-    --popover-foreground: #eef2f0;
-    --muted: #3a4c60;
-    --muted-foreground: #9db5c2;
-    --border: rgba(126, 200, 227, 0.2);
-    --input: rgba(126, 200, 227, 0.28);
-    --ring: rgba(126, 200, 227, 0.4);
+    --background: #161f2c;
+    --foreground: #eef3f6;
+    --card: #1f2b3c;
+    --card-foreground: #eef3f6;
+    --popover: #1f2b3c;
+    --popover-foreground: #eef3f6;
+    --muted: #2e3d50;
+    --muted-foreground: #9aafbc;
+    --border: rgba(126, 200, 227, 0.18);
+    --input: rgba(126, 200, 227, 0.26);
+    --ring: rgba(126, 200, 227, 0.42);
     --primary: #7ec8e3;
-    --primary-foreground: #192231;
+    --primary-foreground: #161f2c;
     --accent: rgba(126, 200, 227, 0.12);
-    --accent-foreground: #eef2f0;
+    --accent-foreground: #eef3f6;
     --destructive: #e86b7a;
-    --destructive-foreground: #192231;
-    --surface-soft: #243044;
-    --surface-tint: #2c3d54;
-    --shadow-soft: rgba(0, 0, 0, 0.28);
+    --destructive-foreground: #161f2c;
+    --surface-soft: #1f2b3c;
+    --surface-tint: #273648;
+    --shadow-soft: rgba(0, 0, 0, 0.32);
+    --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
+    --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
+    --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  /* 青花瓷配色 — 深色主题：夜色青花 */
-  --background: #192231;
-  --foreground: #eef2f0;
-  --card: #243044;
-  --card-foreground: #eef2f0;
-  --popover: #243044;
-  --popover-foreground: #eef2f0;
-  --muted: #3a4c60;
-  --muted-foreground: #9db5c2;
-  --border: rgba(126, 200, 227, 0.2);
-  --input: rgba(126, 200, 227, 0.28);
-  --ring: rgba(126, 200, 227, 0.4);
+  --background: #161f2c;
+  --foreground: #eef3f6;
+  --card: #1f2b3c;
+  --card-foreground: #eef3f6;
+  --popover: #1f2b3c;
+  --popover-foreground: #eef3f6;
+  --muted: #2e3d50;
+  --muted-foreground: #9aafbc;
+  --border: rgba(126, 200, 227, 0.18);
+  --input: rgba(126, 200, 227, 0.26);
+  --ring: rgba(126, 200, 227, 0.42);
   --primary: #7ec8e3;
-  --primary-foreground: #192231;
+  --primary-foreground: #161f2c;
   --accent: rgba(126, 200, 227, 0.12);
-  --accent-foreground: #eef2f0;
+  --accent-foreground: #eef3f6;
   --destructive: #e86b7a;
-  --destructive-foreground: #192231;
-  --surface-soft: #243044;
-  --surface-tint: #2c3d54;
-  --shadow-soft: rgba(0, 0, 0, 0.28);
+  --destructive-foreground: #161f2c;
+  --surface-soft: #1f2b3c;
+  --surface-tint: #273648;
+  --shadow-soft: rgba(0, 0, 0, 0.32);
+  --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
+  --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
+  --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
   color-scheme: dark;
 }
 

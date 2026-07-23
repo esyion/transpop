@@ -1,5 +1,10 @@
-﻿* {
+* {
   box-sizing: border-box;
+}
+
+html {
+  /* rem 基准：设置缩放后整套字号 token 同步变化 */
+  font-size: calc(16px * var(--font-scale, 1));
 }
 
 html,
@@ -15,15 +20,20 @@ body {
   min-height: 100vh;
   overflow: hidden;
   background: var(--background);
-  color: var(--foreground);
-  font-size: calc(16px * var(--font-scale));
-  line-height: 1.5;
+  color: var(--text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 ::selection {
-  background: rgba(42, 96, 116, 0.18);
+  background: color-mix(in srgb, var(--primary) 22%, transparent);
   color: inherit;
 }
 
@@ -39,7 +49,7 @@ body {
 ::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 999px;
-  background: rgba(110, 127, 134, 0.42);
+  background: color-mix(in srgb, var(--muted-foreground) 42%, transparent);
   background-clip: content-box;
 }
 
@@ -48,6 +58,7 @@ input,
 textarea,
 select {
   font: inherit;
+  letter-spacing: inherit;
 }
 
 button {
@@ -59,6 +70,53 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: none;
+}
+
+/* Shared type utilities used by feature CSS */
+.type-hint {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.type-label {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.type-body {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+.type-title {
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.type-content {
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-relaxed);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+kbd {
+  font-family: var(--font-family-mono);
+  font-size: 0.92em;
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
 }
 
 @layer base {

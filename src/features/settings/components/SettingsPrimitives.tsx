@@ -31,7 +31,7 @@ export function SettingGroup({
           {icon}
         </span>
         <div>
-          <CardTitle className="text-sm">{title}</CardTitle>
+          <CardTitle>{title}</CardTitle>
           <CardDescription>{description}</CardDescription>
         </div>
       </CardHeader>
@@ -42,7 +42,7 @@ export function SettingGroup({
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="grid gap-1.5 text-[11px] font-semibold tracking-[0.04em] text-muted-foreground">
+    <label className="setting-field-label grid gap-1.5">
       {label}
       {children}
     </label>
@@ -61,8 +61,8 @@ export function SwitchRow({
   onCheckedChange,
 }: SwitchRowProps) {
   return (
-    <label className="setting-row flex items-center justify-between gap-4 border border-border px-3 py-2.5 text-sm">
-      <span>{label}</span>
+    <label className="setting-row flex items-center justify-between gap-4 border border-border px-3 py-2.5">
+      <span className="text-sm font-normal text-foreground">{label}</span>
       <Switch
         checked={checked}
         onChange={(event) => onCheckedChange(event.currentTarget.checked)}

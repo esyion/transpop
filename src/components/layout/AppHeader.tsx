@@ -37,14 +37,14 @@ export function AppHeader({
           <Languages size={18} />
         </span>
         <span className="brand-copy">
-          <strong className="brand-title text-foreground">TransPop</strong>
+          <strong className="brand-title">TransPop</strong>
           <span className="brand-subtitle">{languageHint}</span>
         </span>
       </button>
 
       <div className="header-tools">
         <Badge variant="secondary" className="status-badge hidden sm:inline-flex">
-          {smartTargetLanguage ? "智能翻译语言" : getLanguageLabel(effectiveTargetLanguage)}
+          {smartTargetLanguage ? "自动" : getLanguageLabel(effectiveTargetLanguage)}
         </Badge>
         <Badge
           className="shortcut-badge"

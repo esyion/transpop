@@ -1,4 +1,4 @@
-﻿import * as React from "react";
+import * as React from "react";
 import { cn } from "../../lib/utils";
 
 type BadgeVariant = "default" | "secondary" | "outline" | "destructive";
@@ -19,7 +19,7 @@ const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
     <span
       ref={ref}
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-[0.045em]",
+        "inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium tracking-normal",
         variantClasses[variant],
         className,
       )}

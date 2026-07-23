@@ -109,15 +109,15 @@ export function SettingsPanel() {
               </Button>
             </div>
           </Field>
-          <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck size={13} /> {settings.apiKeyConfigured ? "API 密钥已加密存储在本地 SQLite 中。" : "开始翻译前需要先配置 API 密钥。"}
+          <p className="setting-help inline-flex items-center gap-1.5">
+            <ShieldCheck size={13} /> {settings.apiKeyConfigured ? "API 密钥已加密存储在本地" : "开始翻译前需要先配置 API 密钥"}
           </p>
         </SettingGroup>
 
         <SettingGroup
           icon={<Monitor size={17} />}
           title="翻译语言"
-          description="智能模式默认将中文翻译为英语，将其他语言翻译为中文。"
+          description="智能模式默认将中文翻译为英语，将其他语言翻译为中文"
         >
           <SwitchRow
             label="智能选择目标语言"
@@ -126,7 +126,7 @@ export function SettingsPanel() {
           />
           <Field label="默认目标语言">
             <select
-              className="setting-row h-10 border border-border px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+              className="setting-row h-10 border border-border px-3 outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
               value={settings.targetLanguage}
               disabled={settings.smartTargetLanguage}
               onChange={(event) => updateSettings({ targetLanguage: event.currentTarget.value as Language })}
@@ -140,7 +140,7 @@ export function SettingsPanel() {
           </Field>
         </SettingGroup>
 
-        <SettingGroup icon={<Palette size={17} />} title="主题" description="选择界面外观，也可以跟随系统主题。">
+        <SettingGroup icon={<Palette size={17} />} title="主题" description=''>
           <div className="grid grid-cols-3 gap-1 rounded-xl border border-border bg-background p-1">
             {THEME_OPTIONS.map((theme) => (
               <Button
@@ -171,7 +171,7 @@ export function SettingsPanel() {
           />
         </SettingGroup>
 
-        <SettingGroup icon={<KeyRound size={17} />} title="快捷键" description="按下组合键即可录制，无需手动输入快捷键格式。">
+        <SettingGroup icon={<KeyRound size={17} />} title="快捷键" description="按下组合键即可录制">
           <SwitchRow
             label="启用快捷键"
             checked={settings.shortcutEnabled}
@@ -188,10 +188,8 @@ export function SettingsPanel() {
               {recordingShortcut ? "请按下快捷键..." : "录制快捷键"}
             </Button>
           </div>
-          {shortcutError ? (
-            <p className="text-xs text-destructive">快捷键注册失败，可尝试 Ctrl + Alt + T。</p>
-          ) : (
-            <p className="text-xs text-muted-foreground">如果快捷键已被系统占用，TransPop 会继续运行，你可以重新录制其他组合键。</p>
+          {shortcutError && (
+            <p className="setting-help text-destructive">快捷键注册失败，可尝试 Ctrl + Alt + T。</p>
           )}
         </SettingGroup>
 

@@ -89,7 +89,7 @@ export function TranslationWorkspace({
         activeId={activeHistoryId}
       />
 
-      <ShortcutStrip />
+      {/* <ShortcutStrip /> */}
     </div>
   );
 }

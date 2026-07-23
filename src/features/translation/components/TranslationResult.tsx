@@ -37,7 +37,7 @@ export function TranslationResult({
     return (
       <Card className="result-card border-border/70">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+          <CardTitle className="flex items-center gap-2 font-medium text-foreground/80">
             <Languages size={15} /> 正在翻译...
           </CardTitle>
           <CardDescription>
@@ -61,7 +61,7 @@ export function TranslationResult({
     return (
       <Card className="result-card border-primary/25">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-foreground">
+          <CardTitle>
             请先添加 API 密钥
           </CardTitle>
           <CardDescription>
@@ -81,7 +81,7 @@ export function TranslationResult({
     return (
       <Card className="result-card border-destructive/25">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-semibold text-destructive">
+          <CardTitle className="text-destructive">
             翻译失败
           </CardTitle>
           <CardDescription>{error}</CardDescription>
@@ -101,11 +101,11 @@ export function TranslationResult({
   if (!resultText) {
     return (
       <Card className="result-card empty-result border-border/70">
-        <CardContent className="grid gap-1 py-10 text-sm">
-          <strong className="text-base font-semibold text-foreground">
+        <CardContent className="grid gap-1.5 py-10">
+          <strong className="text-base font-semibold leading-snug tracking-tight text-foreground">
             输入或粘贴需要翻译的文本
           </strong>
-          <p className="text-muted-foreground">
+          <p className="text-xs font-normal leading-normal text-muted-foreground">
             停止输入 1 秒后将自动显示翻译结果。
           </p>
         </CardContent>
@@ -118,11 +118,11 @@ export function TranslationResult({
       <CardHeader className="flex-row items-start justify-between gap-4 pb-3">
         <div className="space-y-1">
           <CardTitle className="result-title text-foreground">翻译结果</CardTitle>
-          <CardDescription>
+          {/* <CardDescription>
             {autoCopy
               ? "已自动复制。需要更新结果时可重新翻译。"
               : "可以直接复制或重新翻译。"}
-          </CardDescription>
+          </CardDescription> */}
         </div>
         <Button variant="ghost" size="sm" onClick={onRetry} disabled={!canRetry}>
           <RotateCcw size={15} /> 重新翻译
@@ -138,9 +138,9 @@ export function TranslationResult({
           <Button variant="ghost" onClick={onRetry} disabled={!canRetry}>
             <RotateCcw size={15} /> 重新翻译
           </Button>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground">
+          {/* <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs font-normal text-muted-foreground">
             <ArrowUpDown size={13} /> 上下键切换历史
-          </span>
+          </span> */}
         </div>
       </CardContent>
     </Card>

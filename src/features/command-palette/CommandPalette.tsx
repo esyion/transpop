@@ -69,32 +69,32 @@ export function CommandPalette({
                 <CommandInput
                   autoFocus
                   placeholder="搜索命令..."
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+                  className="w-full bg-transparent text-sm font-normal leading-normal outline-none placeholder:text-muted-foreground/55"
                   onKeyDown={(event) => {
                     if (event.key === "Escape") onOpenChange(false);
                   }}
                 />
               </div>
               <CommandList className="max-h-80 overflow-auto p-2">
-                <CommandEmpty className="px-3 py-8 text-center text-sm text-muted-foreground">
+                <CommandEmpty className="px-3 py-8 text-center text-sm font-normal text-muted-foreground">
                   未找到匹配的命令。
                 </CommandEmpty>
                 <CommandGroup
                   heading="命令"
-                  className="px-1 py-1 text-xs text-muted-foreground"
+                  className="px-1 py-1 text-xs font-medium text-muted-foreground"
                 >
                   {commandItems.map(({ label, hint, action, icon: Icon }) => (
                     <CommandItem
                       key={action}
                       value={label}
                       onSelect={() => onExecute(action)}
-                      className="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2 text-sm outline-none aria-selected:bg-accent aria-selected:text-foreground"
+                      className="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2 text-sm font-normal leading-normal outline-none aria-selected:bg-accent aria-selected:text-foreground"
                     >
                       <span className="flex items-center gap-3">
                         <Icon size={16} className="text-muted-foreground" />
                         {label}
                       </span>
-                      <span className="text-xs text-muted-foreground">{hint}</span>
+                      <span className="font-mono text-xs font-medium text-muted-foreground">{hint}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>

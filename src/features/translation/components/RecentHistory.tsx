@@ -18,14 +18,14 @@ export function RecentHistory({ items, activeId, onUse }: RecentHistoryProps) {
             key={item.id}
             type="button"
             onClick={() => onUse(item)}
-            className={`history-card border px-3 py-2 text-left text-xs ${
+            className={`history-card border px-3 py-2 text-left ${
               activeId === item.id
                 ? "is-active border-primary/50 bg-primary/10"
                 : "border-border bg-background/70"
             }`}
           >
-            <div className="truncate font-medium text-foreground">{item.input}</div>
-            <div className="truncate text-muted-foreground">{item.output}</div>
+            <div className="history-input truncate">{item.input}</div>
+            <div className="history-output truncate">{item.output}</div>
           </button>
         ))}
       </div>
