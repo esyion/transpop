@@ -234,12 +234,19 @@ jobs:
               return;
             }
 
+            const { data: release } = await github.rest.repos.getRelease({
+              owner,
+              repo,
+              release_id,
+            });
+            const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
             const publicUrlByApiUrl = new Map(
-              assets.map((asset) => [asset.url, asset.browser_download_url]),
+              assets.map((asset) => [
+                asset.url,
+                `${serverUrl}/${owner}/${repo}/releases/download/${encodeURIComponent(release.tag_name)}/${encodeURIComponent(asset.name)}`,
+              ]),
             );
-            const existingPublicUrls = new Set(
-              assets.map((asset) => asset.browser_download_url),
-            );
+            const existingPublicUrls = new Set(publicUrlByApiUrl.values());
             let rewrittenCount = 0;
 
             for (const [platformName, platform] of Object.entries(latest.platforms)) {
