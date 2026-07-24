@@ -1,4 +1,4 @@
-﻿import { Check, KeyRound, Monitor, Palette, PlugZap, Power, ShieldCheck, Type } from "lucide-react";
+﻿import { Check, CircleArrowUp, KeyRound, LoaderCircle, Monitor, Palette, PlugZap, Power, RefreshCw, ShieldCheck, Type } from "lucide-react";
 import type { KeyboardEvent } from "react";
 import { useState } from "react";
 import { Badge } from "../../../components/ui/badge";
@@ -16,9 +16,10 @@ import {
 } from "../../../utils/constants";
 import type { ApiMode, Language, ThemeMode } from "../../../types/translation";
 import { Field, SettingGroup, SwitchRow } from "./SettingsPrimitives";
+import type { AppUpdaterController } from "../../updater/useAppUpdater";
 
 
-export function SettingsPanel() {
+export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
   const { settings, shortcutError, updateSettings } = useAppStore();
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [recordingShortcut, setRecordingShortcut] = useState(false);
@@ -206,6 +207,83 @@ export function SettingsPanel() {
               onChange={(event) => updateSettings({ fontScale: Number(event.currentTarget.value) })}
             />
           </Field>
+        </SettingGroup>
+
+        <SettingGroup
+          icon={<CircleArrowUp size={17} />}
+          title="应用更新"
+          description="检查并安装 TransPop 的新版本"
+        >
+          <div className="setting-row flex items-center justify-between gap-3 border border-border px-3 py-2.5">
+            <span className="text-sm font-normal text-foreground">当前版本</span>
+            <Badge variant="outline">
+              {updater.currentVersion ? `v${updater.currentVersion}` : "读取中..."}
+            </Badge>
+          </div>
+
+          {updater.status === "available" && updater.availableVersion ? (
+            <div className="grid gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-foreground">发现新版本</span>
+                <Badge variant="default">v{updater.availableVersion}</Badge>
+              </div>
+              {updater.releaseNotes ? (
+                <p className="max-h-24 overflow-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
+                  {updater.releaseNotes}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {updater.status === "downloading" || updater.status === "installing" ? (
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>{updater.status === "installing" ? "正在安装更新..." : "正在下载更新..."}</span>
+                <span>{updater.progress === null ? "" : `${updater.progress}%`}</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-200"
+                  style={{ width: `${updater.progress ?? 24}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
+
+          {updater.status === "error" && updater.error ? (
+            <p className="setting-help text-destructive">{updater.error}</p>
+          ) : null}
+
+          <Button
+            type="button"
+            className="w-full"
+            variant={updater.status === "available" ? "accent" : "outline"}
+            disabled={updater.status === "checking" || updater.status === "downloading" || updater.status === "installing"}
+            onClick={() => {
+              if (updater.status === "available") {
+                void updater.installUpdate();
+              } else {
+                void updater.checkForUpdates();
+              }
+            }}
+          >
+            {updater.status === "checking" ? <LoaderCircle className="animate-spin" size={15} /> : null}
+            {updater.status === "downloading" ? <LoaderCircle className="animate-spin" size={15} /> : null}
+            {updater.status === "installing" ? <LoaderCircle className="animate-spin" size={15} /> : null}
+            {updater.status === "available" ? <CircleArrowUp size={15} /> : null}
+            {updater.status !== "checking" && updater.status !== "downloading" && updater.status !== "installing" && updater.status !== "available" ? <RefreshCw size={15} /> : null}
+            {updater.status === "available"
+              ? "立即升级"
+              : updater.status === "checking"
+                ? "正在检查..."
+                : updater.status === "downloading"
+                  ? "正在下载..."
+                  : updater.status === "installing"
+                    ? "正在安装..."
+                    : updater.status === "upToDate"
+                      ? "重新检查"
+                      : "检查更新"}
+          </Button>
         </SettingGroup>
       </div>
     </section>

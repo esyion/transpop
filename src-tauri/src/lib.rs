@@ -28,6 +28,8 @@ pub fn run() {
                 eprintln!("failed to show main window from second instance: {err}");
             }
         }))
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(global_shortcut_plugin)

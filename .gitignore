@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .omc
+# Local Tauri signing keys
+/.tauri/
+/~/

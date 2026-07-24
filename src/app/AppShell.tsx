@@ -1,6 +1,6 @@
 ﻿import { motion } from "framer-motion";
-import { useRef, useState } from "react";
-import { Toaster } from "sonner";
+import { useEffect, useRef, useState } from "react";
+import { toast, Toaster } from "sonner";
 import { useAppBootstrap } from "./hooks/useAppBootstrap";
 import { useAppCommands } from "./hooks/useAppCommands";
 import { useDesktopWindow } from "./hooks/useDesktopWindow";
@@ -11,6 +11,7 @@ import { HistoryPanel } from "../features/history/components/HistoryPanel";
 import { SettingsPanel } from "../features/settings/components/SettingsPanel";
 import { TranslationWorkspace } from "../features/translation/components/TranslationWorkspace";
 import { useTranslationController } from "../features/translation/hooks/useTranslationController";
+import { useAppUpdater } from "../features/updater/useAppUpdater";
 import { useAppStore } from "../store/appStore";
 import "../styles/index.css";
 
@@ -21,6 +22,7 @@ export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const setView = useAppStore((state) => state.setView);
   const translation = useTranslationController();
+  const updater = useAppUpdater();
   const { hideWindow } = useDesktopWindow(inputRef);
   const { executeCommand, handleInputKeyDown } =
     useAppCommands({
@@ -38,6 +40,27 @@ export function AppShell() {
       moveHistory: translation.moveHistory,
       hideWindow,
     });
+
+  useEffect(() => {
+    if (updater.status !== "available" || !updater.availableVersion) return;
+
+    const toastId = toast.info(
+      `发现新版本 v${updater.availableVersion}`,
+      {
+        id: "transpop-update-available",
+        duration: Number.POSITIVE_INFINITY,
+        description: "点击即可下载、验证签名并安装更新。",
+        action: {
+          label: "立即升级",
+          onClick: () => void updater.installUpdate(),
+        },
+      },
+    );
+
+    return () => {
+      toast.dismiss(toastId);
+    };
+  }, [updater.availableVersion, updater.installUpdate, updater.status]);
 
   return (
     <main className="app-shell relative min-h-screen overflow-hidden">
@@ -90,7 +113,7 @@ export function AppShell() {
               historyTotalCount={translation.history.length}
             />
           }
-          settings={<SettingsPanel />}
+          settings={<SettingsPanel updater={updater} />}
           history={
             <HistoryPanel
               items={translation.history}

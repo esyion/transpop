@@ -90,6 +90,30 @@ Release steps:
 
 You can also rerun the workflow manually from GitHub Actions with an existing tag name, as long as that release has not already been published.
 
+### Automatic updates
+
+Installed desktop builds check GitHub Releases for signed updates. The updater endpoint is:
+
+```text
+https://github.com/esyion/transpop/releases/latest/download/latest.json
+```
+
+One-time repository setup:
+
+1. Generate the updater signing key on a trusted machine:
+
+   ```powershell
+   New-Item -ItemType Directory -Force "$HOME\.tauri" | Out-Null
+   pnpm tauri signer generate -w "$HOME\.tauri\transpop.key"
+   ```
+
+2. Store the complete private-key file content and its password as GitHub Actions repository secrets:
+   - `TAURI_SIGNING_PRIVATE_KEY`
+   - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`
+3. Keep `transpop.key` and its password backed up securely. Never commit the private key.
+
+The release workflow uses the signing secrets to upload updater signatures and `latest.json`. Windows updater metadata prefers the NSIS installer.
+
 ## LLM Configuration
 
 Open **Settings 閳?LLM API** in the app and configure:
