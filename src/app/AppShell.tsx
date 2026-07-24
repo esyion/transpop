@@ -69,7 +69,7 @@ export function AppShell() {
         initial={{ opacity: 0, scale: 0.98, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.16, ease: "easeOut" }}
-        className="app-window relative mx-auto flex w-full max-w-[920px] flex-col"
+        className="app-window relative mx-auto flex w-full max-w-230 flex-col"
         aria-label="TransPop 翻译器"
       >
         <AppHeader
