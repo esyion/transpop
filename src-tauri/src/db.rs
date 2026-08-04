@@ -271,6 +271,7 @@ fn migrate(conn: &Connection) -> Result<(), String> {
     ensure_column(conn, "app_settings", "api_mode", "TEXT NOT NULL DEFAULT 'responses'")?;
     ensure_column(conn, "app_settings", "model", "TEXT NOT NULL DEFAULT 'gpt-5.4'")?;
     ensure_column(conn, "app_settings", "smart_target_language", "INTEGER NOT NULL DEFAULT 1")?;
+    ensure_column(conn, "app_settings", "startup", "INTEGER NOT NULL DEFAULT 0")?;
     ensure_column(conn, "app_settings", "auto_copy", "INTEGER NOT NULL DEFAULT 1")?;
     ensure_column(conn, "app_settings", "api_key_ciphertext", "TEXT")?;
     ensure_column(conn, "app_settings", "api_key_nonce", "TEXT")?;

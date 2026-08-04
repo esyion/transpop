@@ -20,7 +20,7 @@ import type { AppUpdaterController } from "../../updater/useAppUpdater";
 
 
 export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
-  const { settings, shortcutError, updateSettings } = useAppStore();
+  const { settings, shortcutError, startupError, updateSettings } = useAppStore();
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [recordingShortcut, setRecordingShortcut] = useState(false);
 
@@ -170,6 +170,9 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
             checked={settings.startup}
             onCheckedChange={(checked) => updateSettings({ startup: checked })}
           />
+          {startupError && (
+            <p className="setting-help text-destructive">开机自启设置失败：{startupError}</p>
+          )}
         </SettingGroup>
 
         <SettingGroup icon={<KeyRound size={17} />} title="快捷键" description="按下组合键即可录制">
@@ -296,5 +299,4 @@ function normalizeKey(key: string) {
   if (key.length === 1) return key.toUpperCase();
   return key;
 }
-
 
