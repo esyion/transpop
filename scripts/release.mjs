@@ -9,6 +9,7 @@ export const VERSION_FILES = [
   'package.json',
   'src-tauri/tauri.conf.json',
   'src-tauri/Cargo.toml',
+  'src-tauri/Cargo.lock',
 ]
 
 const RELEASE_TYPES = new Set(['patch', 'minor', 'major'])
@@ -61,16 +62,40 @@ export function updateCargoPackageVersion(content, version) {
   )
 }
 
+export function updateCargoLockPackageVersion(content, version, packageName = 'transpop') {
+  const packageBlocks = content.matchAll(/(^\[\[package\]\]\r?\n[\s\S]*?)(?=^\[\[package\]\]|(?![\s\S]))/gm)
+
+  for (const packageBlock of packageBlocks) {
+    const block = packageBlock[1]
+    if (!new RegExp(`^name\\s*=\\s*"${packageName}"`, 'm').test(block)) continue
+
+    if (!/^version\s*=\s*"[^"]*"/m.test(block)) {
+      throw new Error(`Cargo.lock package ${packageName} does not contain version`)
+    }
+
+    const updatedBlock = block.replace(/^version\s*=\s*"[^"]*"/m, `version = "${version}"`)
+    return (
+      content.slice(0, packageBlock.index) +
+      updatedBlock +
+      content.slice(packageBlock.index + block.length)
+    )
+  }
+
+  throw new Error(`Cargo.lock does not contain package ${packageName}`)
+}
+
 export function syncVersionFiles(rootDir, version, { dryRun = false } = {}) {
   validateVersion(version)
 
   const packagePath = resolve(rootDir, 'package.json')
   const tauriConfigPath = resolve(rootDir, 'src-tauri/tauri.conf.json')
   const cargoPath = resolve(rootDir, 'src-tauri/Cargo.toml')
+  const cargoLockPath = resolve(rootDir, 'src-tauri/Cargo.lock')
 
   const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'))
   const tauriConfig = JSON.parse(readFileSync(tauriConfigPath, 'utf8'))
   const cargoToml = readFileSync(cargoPath, 'utf8')
+  const cargoLock = readFileSync(cargoLockPath, 'utf8')
 
   packageJson.version = version
   tauriConfig.version = version
@@ -79,6 +104,7 @@ export function syncVersionFiles(rootDir, version, { dryRun = false } = {}) {
     [packagePath, `${JSON.stringify(packageJson, null, 2)}\n`],
     [tauriConfigPath, `${JSON.stringify(tauriConfig, null, 2)}\n`],
     [cargoPath, updateCargoPackageVersion(cargoToml, version)],
+    [cargoLockPath, updateCargoLockPackageVersion(cargoLock, version)],
   ]
 
   const changed = updates
@@ -166,10 +192,15 @@ Examples:
 `
 }
 
+export function commandNeedsShell(command, platform = process.platform) {
+  return platform === 'win32' && /\.(?:cmd|bat)$/i.test(command)
+}
+
 function run(command, args, { cwd, stdio = 'inherit' } = {}) {
   return execFileSync(command, args, {
     cwd,
     encoding: stdio === 'pipe' ? 'utf8' : undefined,
+    shell: commandNeedsShell(command),
     stdio,
   })
 }
