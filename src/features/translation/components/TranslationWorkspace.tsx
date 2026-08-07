@@ -1,5 +1,4 @@
-﻿import type { KeyboardEvent, RefObject } from "react";
-import { Separator } from "../../../components/ui/separator";
+import type { KeyboardEvent, RefObject } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import type { HistoryItem } from "../../../types/translation";
 import { RecentHistory } from "./RecentHistory";
@@ -47,42 +46,52 @@ export function TranslationWorkspace({
   historyTotalCount,
 }: TranslationWorkspaceProps) {
   return (
-    <div className="translation-layout grid gap-4">
-      <div className="input-panel">
-        <div className="panel-label-row">
-          <span className="section-kicker">
-            <span className="mini-seal" aria-hidden="true" /> 原文
-          </span>
+    <div className="translation-layout">
+      <h2 className="sr-only">翻译</h2>
+      <div className="translation-stage">
+        <section className="input-panel" aria-labelledby="source-panel-title">
+          <div className="panel-label-row">
+            <span className="section-kicker" id="source-panel-title">
+              原文
+            </span>
+            <span className="character-count" aria-label={`${input.length} 个字符`}>
+              {input.length}
+            </span>
+          </div>
+          <label className="sr-only" htmlFor="translate-input">
+            待翻译文本
+          </label>
+          <Textarea
+            id="translate-input"
+            ref={inputRef}
+            value={input}
+            onChange={(event) => onInputChange(event.currentTarget.value)}
+            onKeyDown={onInputKeyDown}
+            placeholder="粘贴或输入文本…"
+            rows={5}
+            spellCheck="false"
+            name="source-text"
+            autoComplete="off"
+            className="input-textarea focus-visible:ring-0"
+          />
+        </section>
+
+        <div className="translation-divider" aria-hidden="true">
+          <span />
         </div>
-        <label className="sr-only" htmlFor="translate-input">
-          待翻译文本
-        </label>
-        <Textarea
-          id="translate-input"
-          ref={inputRef}
-          value={input}
-          onChange={(event) => onInputChange(event.currentTarget.value)}
-          onKeyDown={onInputKeyDown}
-          placeholder="在此粘贴或输入文本..."
-          rows={2}
-          spellCheck="false"
-          className="input-textarea focus-visible:ring-0"
+
+        <TranslationResult
+          loading={loading}
+          error={error}
+          resultText={resultText}
+          canRetry={input.trim().length > 0 && !apiKeyMissing}
+          copied={copied}
+          apiKeyMissing={apiKeyMissing && input.trim().length > 0}
+          onCopy={onCopy}
+          onRetry={onRetry}
+          onOpenSettings={onOpenSettings}
         />
       </div>
-
-      <Separator className="ink-divider" />
-
-      <TranslationResult
-        loading={loading}
-        error={error}
-        resultText={resultText}
-        canRetry={input.trim().length > 0 && !apiKeyMissing}
-        copied={copied}
-        apiKeyMissing={apiKeyMissing && input.trim().length > 0}
-        onCopy={onCopy}
-        onRetry={onRetry}
-        onOpenSettings={onOpenSettings}
-      />
 
       <RecentHistory
         items={history}

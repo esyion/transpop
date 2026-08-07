@@ -1,4 +1,4 @@
-﻿import { Check, Copy, Languages, RotateCcw, Settings } from "lucide-react";
+import { Check, Copy, Languages, RotateCcw, Settings } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import {
   Card,
@@ -33,10 +33,10 @@ export function TranslationResult({
 }: TranslationResultProps) {
   if (loading) {
     return (
-      <Card className="result-card border-border/70">
+      <Card key="loading" className="result-card result-state animate-in border-border/70 fade-in zoom-in-95 duration-300" aria-live="polite">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 font-medium text-foreground/80">
-            <Languages size={15} /> 正在翻译...
+            <Languages size={15} aria-hidden="true" /> 正在翻译…
           </CardTitle>
           <CardDescription>
             正在生成翻译结果，请稍候
@@ -57,7 +57,7 @@ export function TranslationResult({
 
   if (apiKeyMissing) {
     return (
-      <Card className="result-card border-primary/25">
+      <Card key="missing-key" className="result-card result-state animate-in border-primary/25 fade-in zoom-in-95 duration-300">
         <CardHeader className="pb-2">
           <CardTitle>
             请先添加 API 密钥
@@ -77,7 +77,7 @@ export function TranslationResult({
 
   if (error) {
     return (
-      <Card className="result-card border-destructive/25">
+      <Card key="error" className="result-card result-state animate-in border-destructive/25 fade-in zoom-in-95 duration-300" role="alert">
         <CardHeader className="pb-2">
           <CardTitle className="text-destructive">
             翻译失败
@@ -98,9 +98,9 @@ export function TranslationResult({
 
   if (!resultText) {
     return (
-      <Card className="result-card empty-result border-border/70">
+      <Card key="empty" className="result-card result-state empty-result animate-in border-border/70 fade-in duration-300">
         <CardContent className="grid gap-1.5 py-10">
-          <strong className="text-base font-semibold leading-snug tracking-tight text-foreground">
+          <strong className="text-base font-semibold leading-snug tracking-normal text-foreground">
             输入或粘贴需要翻译的文本
           </strong>
           <p className="text-xs font-normal leading-normal text-muted-foreground">
@@ -112,7 +112,7 @@ export function TranslationResult({
   }
 
   return (
-    <Card className="result-card border-border/70">
+    <Card key="result" className="result-card result-state animate-in border-border/70 fade-in slide-in-from-bottom-2 duration-300" aria-live="polite">
       <CardHeader className="flex-row items-start justify-between gap-4 pb-3">
         <div className="space-y-1">
           <CardTitle className="result-title text-foreground">翻译结果</CardTitle>

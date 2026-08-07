@@ -39,15 +39,16 @@ export function RecentHistory({
           </button>
         ) : null}
       </div>
-      <div className="grid gap-2">
-        {items.slice(0, 3).map((item) => (
+      <div className="history-list">
+        {items.slice(0, 3).map((item, index) => (
           <div
             key={item.id}
-            className={`history-card group flex items-center gap-2 border px-3 py-2 text-left ${
+            className={`history-card group flex animate-in items-center gap-2 border px-3 py-2 text-left fade-in slide-in-from-bottom-1 duration-300 ${
               activeId === item.id
                 ? "is-active border-primary/50 bg-primary/10"
                 : "border-border bg-background/70"
             }`}
+            style={{ animationDelay: `${index * 45}ms` }}
           >
             <button
               type="button"
@@ -68,7 +69,7 @@ export function RecentHistory({
               aria-label="删除历史记录"
               title="删除"
             >
-              <Trash2 size={14} />
+              <Trash2 size={14} aria-hidden="true" />
             </button>
           </div>
         ))}

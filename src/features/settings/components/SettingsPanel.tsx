@@ -1,4 +1,4 @@
-﻿import { Check, CircleArrowUp, KeyRound, LoaderCircle, Monitor, Palette, PlugZap, Power, RefreshCw, ShieldCheck, Type } from "lucide-react";
+import { Check, CircleArrowUp, KeyRound, LoaderCircle, Monitor, Palette, PlugZap, Power, RefreshCw, ShieldCheck, Type } from "lucide-react";
 import type { KeyboardEvent } from "react";
 import { useState } from "react";
 import { Badge } from "../../../components/ui/badge";
@@ -55,6 +55,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
 
   return (
     <section className="settings-layout" aria-label="设置">
+      <h2 className="sr-only">设置</h2>
       <div className="settings-list grid gap-3">
         <SettingGroup
           icon={<PlugZap size={17} />}
@@ -64,7 +65,10 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
           <Field label="接口地址">
             <Input
               value={settings.apiBaseUrl}
-              placeholder="https://api.openai.com/v1"
+              placeholder="例如 https://api.openai.com/v1…"
+              type="url"
+              name="api-base-url"
+              autoComplete="off"
               onChange={(event) => updateSettings({ apiBaseUrl: event.currentTarget.value })}
             />
           </Field>
@@ -89,7 +93,10 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
           <Field label="模型">
             <Input
               value={settings.model}
-              placeholder={settings.apiMode === "responses" ? "gpt-5.4" : "qwen-plus / moonshot-v1-8k"}
+              placeholder={settings.apiMode === "responses" ? "例如 gpt-5.4…" : "例如 qwen-plus…"}
+              name="model"
+              autoComplete="off"
+              spellCheck={false}
               onChange={(event) => updateSettings({ model: event.currentTarget.value })}
             />
           </Field>
@@ -99,7 +106,10 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
               <Input
                 value={apiKeyDraft}
                 type="password"
-                placeholder={settings.apiKeyConfigured ? "已安全保存，粘贴新密钥可替换" : "粘贴 API 密钥"}
+                placeholder={settings.apiKeyConfigured ? "粘贴新密钥以替换…" : "粘贴 API 密钥…"}
+                name="api-key"
+                autoComplete="off"
+                spellCheck={false}
                 onChange={(event) => setApiKeyDraft(event.currentTarget.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Enter") saveApiKey();
@@ -129,6 +139,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
             <select
               className="setting-row h-10 border border-border px-3 outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
               value={settings.targetLanguage}
+              name="target-language"
               disabled={settings.smartTargetLanguage}
               onChange={(event) => updateSettings({ targetLanguage: event.currentTarget.value as Language })}
             >
@@ -189,7 +200,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
               onClick={() => setRecordingShortcut(true)}
               onKeyDown={recordShortcut}
             >
-              {recordingShortcut ? "请按下快捷键..." : "录制快捷键"}
+              {recordingShortcut ? "请按下快捷键…" : "录制快捷键"}
             </Button>
           </div>
           {shortcutError && (
@@ -202,6 +213,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
             <input
               className="w-full accent-primary"
               aria-label="字体缩放"
+              name="font-scale"
               type="range"
               min="0.9"
               max="1.2"
@@ -220,7 +232,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
           <div className="setting-row flex items-center justify-between gap-3 border border-border px-3 py-2.5">
             <span className="text-sm font-normal text-foreground">当前版本</span>
             <Badge variant="outline">
-              {updater.currentVersion ? `v${updater.currentVersion}` : "读取中..."}
+              {updater.currentVersion ? `v${updater.currentVersion}` : "读取中…"}
             </Badge>
           </div>
 
@@ -241,7 +253,7 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
           {updater.status === "downloading" || updater.status === "installing" ? (
             <div className="grid gap-2">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{updater.status === "installing" ? "正在安装更新..." : "正在下载更新..."}</span>
+                <span>{updater.status === "installing" ? "正在安装更新…" : "正在下载更新…"}</span>
                 <span>{updater.progress === null ? "" : `${updater.progress}%`}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-border">
@@ -278,11 +290,11 @@ export function SettingsPanel({ updater }: { updater: AppUpdaterController }) {
             {updater.status === "available"
               ? "立即升级"
               : updater.status === "checking"
-                ? "正在检查..."
+                ? "正在检查…"
                 : updater.status === "downloading"
-                  ? "正在下载..."
+                  ? "正在下载…"
                   : updater.status === "installing"
-                    ? "正在安装..."
+                    ? "正在安装…"
                     : updater.status === "upToDate"
                       ? "重新检查"
                       : "检查更新"}
@@ -299,4 +311,3 @@ function normalizeKey(key: string) {
   if (key.length === 1) return key.toUpperCase();
   return key;
 }
-

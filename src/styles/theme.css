@@ -17,7 +17,6 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
-  /* Typography scale — single source of truth */
   --font-sans: var(--font-family-sans);
   --font-mono: var(--font-family-mono);
 
@@ -35,94 +34,70 @@
 
 :root {
   --font-scale: 1;
-
-  /*
-   * Font stack
-   * Latin: system UI first (Segoe UI / SF Pro / Inter)
-   * CJK: platform-native Chinese faces after Latin for mixed text
-   */
   --font-family-sans:
+    "Aptos",
     "Segoe UI Variable",
-    "Segoe UI",
-    "SF Pro Text",
-    "SF Pro Display",
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "PingFang SC",
     "Microsoft YaHei UI",
-    "Microsoft YaHei",
-    "Noto Sans SC",
-    "Noto Sans CJK SC",
-    "Source Han Sans SC",
+    "PingFang SC",
     sans-serif;
-
+  --font-family-display:
+    "Iowan Old Style",
+    "STKaiti",
+    "KaiTi",
+    Georgia,
+    serif;
   --font-family-mono:
     "Cascadia Code",
-    "Segoe UI Mono",
-    "SF Mono",
-    ui-monospace,
-    "Cascadia Mono",
-    "Menlo",
-    "Consolas",
+    "SFMono-Regular",
+    Consolas,
     monospace;
 
-  /*
-   * Type scale (px values × --font-scale via rem on body)
-   * xs   12  — hint / badge / meta
-   * sm   13  — secondary label / caption
-   * base 14  — UI body / button / description
-   * md   15  — section title / brand
-   * lg   17  — input & translation result (primary content)
-   * xl   20  — rare display (empty-state hero)
-   */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.8125rem;  /* 13px */
-  --font-size-base: 0.875rem; /* 14px */
-  --font-size-md: 0.9375rem;  /* 15px */
-  --font-size-lg: 1.0625rem;  /* 17px */
-  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-base: 0.875rem;
+  --font-size-md: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
-
   --line-height-tight: 1.35;
-  --line-height-snug: 1.4;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.65;
-
-  --letter-spacing-tight: -0.01em;
+  --line-height-snug: 1.45;
+  --line-height-normal: 1.55;
+  --line-height-relaxed: 1.7;
+  --letter-spacing-tight: 0;
   --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.02em;
+  --letter-spacing-wide: 0;
 
-  /* 青花瓷配色 — 浅色：卵白底 + 霁蓝主调 */
-  --background: #f7f5f0;
-  --foreground: #1a2834;
-  --card: #fefdfb;
-  --card-foreground: #1a2834;
-  --popover: #fefdfb;
-  --popover-foreground: #1a2834;
-  --muted: #ebe8e0;
-  --muted-foreground: #5c6d78;
-  --border: #c8d8e2;
-  --input: #b7ccd8;
-  --ring: rgba(42, 96, 116, 0.32);
-  --primary: #2a6074;
-  --primary-foreground: #f7f5f0;
-  --accent: #e6f2f7;
-  --accent-foreground: #1a2834;
-  --destructive: #b84050;
-  --destructive-foreground: #f7f5f0;
-  --surface-soft: #ebe8e0;
-  --surface-tint: #e6f2f7;
-  --shadow-soft: rgba(26, 40, 52, 0.08);
+  --background: #f4f2ed;
+  --foreground: #17202a;
+  --card: #fbfaf7;
+  --card-foreground: #17202a;
+  --popover: #fffefa;
+  --popover-foreground: #17202a;
+  --muted: #e9e8e3;
+  --muted-foreground: #65707a;
+  --border: #d3d7da;
+  --input: #bcc3c9;
+  --ring: rgba(33, 103, 199, 0.28);
+  --primary: #2167c7;
+  --primary-foreground: #ffffff;
+  --accent: #e8f0fb;
+  --accent-foreground: #183f73;
+  --destructive: #bd4438;
+  --destructive-foreground: #ffffff;
+  --signal: #df5b46;
+  --surface-soft: #eeede8;
+  --surface-tint: #eef4fb;
+  --surface-raised: #fffefa;
+  --shadow-soft: rgba(23, 32, 42, 0.1);
+  --shadow-strong: rgba(23, 32, 42, 0.16);
 
-  /* Text hierarchy helpers (opacity on foreground ink) */
   --text-primary: var(--foreground);
-  --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
-  --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
-  --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
+  --text-secondary: #4e5964;
+  --text-tertiary: #76808a;
+  --text-placeholder: #8d959d;
 
   color-scheme: light;
   font-family: var(--font-family-sans);
@@ -130,57 +105,63 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    --background: #161f2c;
-    --foreground: #eef3f6;
-    --card: #1f2b3c;
-    --card-foreground: #eef3f6;
-    --popover: #1f2b3c;
-    --popover-foreground: #eef3f6;
-    --muted: #2e3d50;
-    --muted-foreground: #9aafbc;
-    --border: rgba(126, 200, 227, 0.18);
-    --input: rgba(126, 200, 227, 0.26);
-    --ring: rgba(126, 200, 227, 0.42);
-    --primary: #7ec8e3;
-    --primary-foreground: #161f2c;
-    --accent: rgba(126, 200, 227, 0.12);
-    --accent-foreground: #eef3f6;
-    --destructive: #e86b7a;
-    --destructive-foreground: #161f2c;
-    --surface-soft: #1f2b3c;
-    --surface-tint: #273648;
-    --shadow-soft: rgba(0, 0, 0, 0.32);
-    --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
-    --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
-    --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
+    --background: #12171d;
+    --foreground: #f1f3f5;
+    --card: #1a2129;
+    --card-foreground: #f1f3f5;
+    --popover: #202832;
+    --popover-foreground: #f1f3f5;
+    --muted: #28313a;
+    --muted-foreground: #aab2ba;
+    --border: #34404b;
+    --input: #46525e;
+    --ring: rgba(118, 169, 244, 0.4);
+    --primary: #76a9f4;
+    --primary-foreground: #101820;
+    --accent: #26364b;
+    --accent-foreground: #dce9fb;
+    --destructive: #f07769;
+    --destructive-foreground: #1d1110;
+    --signal: #ff816d;
+    --surface-soft: #20272e;
+    --surface-tint: #222f40;
+    --surface-raised: #202832;
+    --shadow-soft: rgba(0, 0, 0, 0.3);
+    --shadow-strong: rgba(0, 0, 0, 0.48);
+    --text-secondary: #c4c9ce;
+    --text-tertiary: #979fa7;
+    --text-placeholder: #7f8992;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --background: #161f2c;
-  --foreground: #eef3f6;
-  --card: #1f2b3c;
-  --card-foreground: #eef3f6;
-  --popover: #1f2b3c;
-  --popover-foreground: #eef3f6;
-  --muted: #2e3d50;
-  --muted-foreground: #9aafbc;
-  --border: rgba(126, 200, 227, 0.18);
-  --input: rgba(126, 200, 227, 0.26);
-  --ring: rgba(126, 200, 227, 0.42);
-  --primary: #7ec8e3;
-  --primary-foreground: #161f2c;
-  --accent: rgba(126, 200, 227, 0.12);
-  --accent-foreground: #eef3f6;
-  --destructive: #e86b7a;
-  --destructive-foreground: #161f2c;
-  --surface-soft: #1f2b3c;
-  --surface-tint: #273648;
-  --shadow-soft: rgba(0, 0, 0, 0.32);
-  --text-secondary: color-mix(in srgb, var(--foreground) 72%, transparent);
-  --text-tertiary: color-mix(in srgb, var(--foreground) 52%, transparent);
-  --text-placeholder: color-mix(in srgb, var(--foreground) 40%, transparent);
+  --background: #12171d;
+  --foreground: #f1f3f5;
+  --card: #1a2129;
+  --card-foreground: #f1f3f5;
+  --popover: #202832;
+  --popover-foreground: #f1f3f5;
+  --muted: #28313a;
+  --muted-foreground: #aab2ba;
+  --border: #34404b;
+  --input: #46525e;
+  --ring: rgba(118, 169, 244, 0.4);
+  --primary: #76a9f4;
+  --primary-foreground: #101820;
+  --accent: #26364b;
+  --accent-foreground: #dce9fb;
+  --destructive: #f07769;
+  --destructive-foreground: #1d1110;
+  --signal: #ff816d;
+  --surface-soft: #20272e;
+  --surface-tint: #222f40;
+  --surface-raised: #202832;
+  --shadow-soft: rgba(0, 0, 0, 0.3);
+  --shadow-strong: rgba(0, 0, 0, 0.48);
+  --text-secondary: #c4c9ce;
+  --text-tertiary: #979fa7;
+  --text-placeholder: #7f8992;
   color-scheme: dark;
 }
 

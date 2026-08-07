@@ -107,9 +107,11 @@ export function HistoryPanel({
           <Input
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
-            placeholder="搜索原文或译文..."
-            className="history-search-input"
-            aria-label="搜索历史记录"
+          placeholder="搜索原文或译文…"
+          className="history-search-input"
+          aria-label="搜索历史记录"
+          name="history-query"
+          autoComplete="off"
           />
         </div>
       </div>
@@ -120,12 +122,13 @@ export function HistoryPanel({
         <div className="history-empty">未找到匹配的历史记录</div>
       ) : (
         <div className="history-full-list">
-          {filtered.map((item) => {
+          {filtered.map((item, index) => {
             const expanded = expandedId === item.id;
             return (
               <article
                 key={item.id}
-                className={`history-full-card ${expanded ? "is-expanded" : ""}`}
+                className={`history-full-card animate-in fade-in slide-in-from-bottom-2 duration-300 ${expanded ? "is-expanded" : ""}`}
+                style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
               >
                 <button
                   type="button"

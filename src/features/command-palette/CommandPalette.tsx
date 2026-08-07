@@ -1,4 +1,4 @@
-﻿import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Command as CommandMenu,
   CommandEmpty,
@@ -46,6 +46,8 @@ export function CommandPalette({
   onOpenChange,
   onExecute,
 }: CommandPaletteProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <AnimatePresence>
       {open ? (
@@ -59,18 +61,25 @@ export function CommandPalette({
           }}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 12 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 8 }}
-            transition={{ duration: 0.12, ease: "easeOut" }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ duration: reduceMotion ? 0 : 0.14, ease: "easeOut" }}
             className="command-palette mx-auto w-full max-w-160"
+            role="dialog"
+            aria-modal="true"
+            aria-label="命令面板"
           >
             <CommandMenu className="w-full bg-transparent text-popover-foreground">
-              <div className="flex items-center gap-2 border-b border-border/70 px-4 py-3 text-muted-foreground">
+              <div className="flex items-center gap-2 border-b border-border/70 px-4 py-3 text-muted-foreground focus-within:ring-2 focus-within:ring-inset focus-within:ring-ring">
                 <Search size={16} />
                 <CommandInput
                   autoFocus
-                  placeholder="搜索命令..."
+                  placeholder="搜索命令…"
+                  aria-label="搜索命令"
+                  name="command-query"
+                  autoComplete="off"
+                  spellCheck={false}
                   className="w-full bg-transparent text-sm font-normal leading-normal outline-none placeholder:text-muted-foreground/55"
                   onKeyDown={(event) => {
                     if (event.key === "Escape") onOpenChange(false);
@@ -90,7 +99,7 @@ export function CommandPalette({
                       key={action}
                       value={label}
                       onSelect={() => onExecute(action)}
-                      className="flex cursor-pointer items-center justify-between gap-4 rounded-xl px-3 py-2 text-sm font-normal leading-normal outline-none aria-selected:bg-accent aria-selected:text-foreground"
+                      className="flex cursor-pointer items-center justify-between gap-4 rounded-md px-3 py-2 text-sm font-normal leading-normal outline-none aria-selected:bg-accent aria-selected:text-foreground"
                     >
                       <span className="flex items-center gap-3">
                         <Icon size={16} className="text-muted-foreground" />

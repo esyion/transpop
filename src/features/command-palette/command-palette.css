@@ -1,16 +1,13 @@
-﻿.command-overlay {
-  background: rgba(28, 43, 56, 0.28) !important;
-  backdrop-filter: blur(3px);
+.command-overlay {
+  overscroll-behavior: contain;
+  background: color-mix(in srgb, var(--foreground) 34%, transparent) !important;
+  backdrop-filter: blur(6px);
 }
 
 .command-palette {
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px !important;
+  border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--border));
+  border-radius: 8px !important;
   background: var(--popover) !important;
-  box-shadow: 0 16px 40px var(--shadow-soft) !important;
-}
-
-.command-palette::before {
-  display: none;
+  box-shadow: 0 24px 64px var(--shadow-strong) !important;
 }

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import type { ViewMode } from "../../types/translation";
 
@@ -15,6 +15,7 @@ export function AppContent({
   settings,
   history,
 }: AppContentProps) {
+  const reduceMotion = useReducedMotion();
   const content =
     view === "settings" ? settings : view === "history" ? history : translation;
   const key =
@@ -29,10 +30,10 @@ export function AppContent({
       <AnimatePresence mode="wait">
         <motion.div
           key={key}
-          initial={{ opacity: 0, y: 8 }}
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.12, ease: "easeOut" }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
+          transition={{ duration: reduceMotion ? 0 : 0.14, ease: "easeOut" }}
         >
           {content}
         </motion.div>

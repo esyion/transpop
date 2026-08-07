@@ -1,4 +1,3 @@
-﻿import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { useAppBootstrap } from "./hooks/useAppBootstrap";
@@ -62,16 +61,31 @@ export function AppShell() {
     };
   }, [updater.availableVersion, updater.installUpdate, updater.status]);
 
+  useEffect(() => {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) return;
+
+    const colorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncThemeColor = () => {
+      const dark =
+        translation.settings.theme === "dark" ||
+        (translation.settings.theme === "system" && colorScheme.matches);
+      meta.content = dark ? "#12171d" : "#f4f2ed";
+    };
+
+    syncThemeColor();
+    colorScheme.addEventListener("change", syncThemeColor);
+    return () => colorScheme.removeEventListener("change", syncThemeColor);
+  }, [translation.settings.theme]);
+
   return (
     <main className="app-shell relative min-h-screen overflow-hidden">
-      <div className="app-aura pointer-events-none absolute inset-0" />
-      <motion.section
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.16, ease: "easeOut" }}
-        className="app-window relative mx-auto flex w-full max-w-230 flex-col"
+      <div className="app-backdrop-grid pointer-events-none absolute inset-0" />
+      <section
+        className="app-window relative mx-auto flex w-full max-w-230 animate-in flex-col fade-in zoom-in-95 slide-in-from-bottom-2 duration-300"
         aria-label="TransPop 翻译器"
       >
+        <h1 className="sr-only">TransPop 翻译器</h1>
         <AppHeader
           languageHint={translation.languageHint}
           effectiveTargetLanguage={translation.effectiveTargetLanguage}
@@ -124,7 +138,7 @@ export function AppShell() {
             />
           }
         />
-      </motion.section>
+      </section>
 
       <CommandPalette
         open={paletteOpen}

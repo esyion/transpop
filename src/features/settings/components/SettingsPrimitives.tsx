@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   Card,
   CardContent,
@@ -22,7 +22,7 @@ export function SettingGroup({
   children,
 }: SettingGroupProps) {
   return (
-    <Card className="setting-card border-border/70">
+    <Card className="setting-card animate-in border-border/70 fade-in slide-in-from-bottom-2 duration-300">
       <CardHeader className="grid grid-cols-[32px_1fr] gap-3 pb-3">
         <span
           className="setting-icon grid size-8 place-items-center"
