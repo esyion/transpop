@@ -77,14 +77,23 @@ The release workflow is `.github/workflows/publish.yml`. It is triggered by push
 
 Release steps:
 
-1. Update the app version in `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and `package.json`.
-2. Commit the version change.
-3. Create and push a matching tag, for example:
+1. Run the release script:
 
    ```bash
-   git tag v0.1.0
+   pnpm release patch
+   ```
+
+   Use `minor`, `major`, or an exact version such as `0.3.0` when needed.
+
+2. The script updates `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, and `package.json`, runs `pnpm build`, commits the version change, and creates the matching tag.
+3. Push the commit and tag:
+
+   ```bash
+   git push origin HEAD
    git push origin v0.1.0
    ```
+
+   You can also run `pnpm release patch --push` to push automatically.
 
 4. Wait for the **Publish installers** GitHub Actions workflow to finish. The workflow first creates a draft release, uploads all installers into that single release, and publishes it automatically only after every platform build succeeds.
 

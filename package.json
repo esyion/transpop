@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "release": "node scripts/release.mjs",
+    "release:test": "node --test scripts/release.test.mjs",
     "tauri": "tauri",
     "tauri:dev": "tauri dev"
   },
@@ -39,5 +41,10 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "postcss": ">=8.5.23"
+    }
   }
 }

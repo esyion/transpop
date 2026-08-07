@@ -1,0 +1,126 @@
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import {
+  bumpVersion,
+  ensureCleanGitStatus,
+  ensureOnlyVersionFilesChanged,
+  parseArgs,
+  resolveTargetVersion,
+  syncVersionFiles,
+  updateCargoPackageVersion,
+} from './release.mjs'
+
+function withFixture(fn) {
+  const root = mkdtempSync(join(tmpdir(), 'transpop-release-'))
+  try {
+    mkdirSync(join(root, 'src-tauri'), { recursive: true })
+    writeFileSync(
+      join(root, 'package.json'),
+      `${JSON.stringify({ name: 'transpop', version: '0.2.7' }, null, 2)}\n`,
+      'utf8',
+    )
+    writeFileSync(
+      join(root, 'src-tauri/tauri.conf.json'),
+      `${JSON.stringify({ productName: 'TransPop', version: '0.2.7' }, null, 2)}\n`,
+      'utf8',
+    )
+    writeFileSync(
+      join(root, 'src-tauri/Cargo.toml'),
+      [
+        '[package]',
+        'name = "transpop"',
+        'version = "0.2.6"',
+        '',
+        '[dependencies]',
+        'serde = { version = "1", features = ["derive"] }',
+        '',
+      ].join('\n'),
+      'utf8',
+    )
+    return fn(root)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+}
+
+test('bumpVersion calculates patch, minor, and major releases', () => {
+  assert.equal(bumpVersion('0.2.7', 'patch'), '0.2.8')
+  assert.equal(bumpVersion('0.2.7', 'minor'), '0.3.0')
+  assert.equal(bumpVersion('0.2.7', 'major'), '1.0.0')
+})
+
+test('resolveTargetVersion accepts release types and exact versions', () => {
+  assert.equal(resolveTargetVersion('0.2.7', 'patch'), '0.2.8')
+  assert.equal(resolveTargetVersion('0.2.7', '0.3.0'), '0.3.0')
+  assert.throws(() => resolveTargetVersion('0.2.7', 'v0.3.0'), /Invalid version/)
+})
+
+test('updateCargoPackageVersion only changes the package version', () => {
+  const content = [
+    '[package]',
+    'name = "transpop"',
+    'version = "0.2.6"',
+    '',
+    '[dependencies]',
+    'serde = { version = "1", features = ["derive"] }',
+    '',
+  ].join('\n')
+
+  const updated = updateCargoPackageVersion(content, '0.2.8')
+  assert.match(updated, /version = "0\.2\.8"/)
+  assert.match(updated, /serde = \{ version = "1", features = \["derive"\] \}/)
+})
+
+test('updateCargoPackageVersion handles package-only Cargo manifests', () => {
+  const content = ['[package]', 'name = "transpop"', 'version = "0.2.6"', ''].join('\n')
+  const updated = updateCargoPackageVersion(content, '0.2.8')
+  assert.match(updated, /version = "0\.2\.8"/)
+})
+
+test('syncVersionFiles updates package, Tauri config, and Cargo package versions', () => {
+  withFixture((root) => {
+    const changed = syncVersionFiles(root, '0.2.8')
+    assert.equal(changed.length, 3)
+
+    const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+    const tauriConfig = JSON.parse(readFileSync(join(root, 'src-tauri/tauri.conf.json'), 'utf8'))
+    const cargoToml = readFileSync(join(root, 'src-tauri/Cargo.toml'), 'utf8')
+
+    assert.equal(packageJson.version, '0.2.8')
+    assert.equal(tauriConfig.version, '0.2.8')
+    assert.match(cargoToml, /\[package\][\s\S]*version = "0\.2\.8"/)
+    assert.match(cargoToml, /serde = \{ version = "1", features = \["derive"\] \}/)
+  })
+})
+
+test('syncVersionFiles dry run reports changes without writing', () => {
+  withFixture((root) => {
+    const changed = syncVersionFiles(root, '0.2.8', { dryRun: true })
+    assert.equal(changed.length, 3)
+
+    const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
+    assert.equal(packageJson.version, '0.2.7')
+  })
+})
+
+test('ensureCleanGitStatus rejects dirty status output', () => {
+  assert.doesNotThrow(() => ensureCleanGitStatus(''))
+  assert.throws(() => ensureCleanGitStatus(' M package.json'), /Working tree is not clean/)
+})
+
+test('ensureOnlyVersionFilesChanged rejects non-version file changes', () => {
+  assert.doesNotThrow(() =>
+    ensureOnlyVersionFilesChanged(' M package.json\n M src-tauri/tauri.conf.json\n M src-tauri/Cargo.toml'),
+  )
+  assert.throws(
+    () => ensureOnlyVersionFilesChanged(' M package.json\n?? dist/index.html'),
+    /Unexpected non-version changes/,
+  )
+})
+
+test('parseArgs rejects incompatible build options', () => {
+  assert.throws(() => parseArgs(['patch', '--no-build', '--tauri-build']), /cannot be used/)
+})
