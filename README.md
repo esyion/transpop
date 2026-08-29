@@ -145,30 +145,3 @@ Use the exact base URL and model name documented by your LLM provider.
 ## Security Notes
 
 TransPop stores local application data in a SQLite database under the Tauri app data directory. API keys are not stored as plaintext: they are encrypted with AES-GCM and the encryption key is saved in the operating system keyring.
-
-## Project Structure
-
-```text
-src/
-  App.tsx                  # Thin application entry point
-  app/                     # Application shell and lifecycle hooks
-  features/                # Feature modules (translation, settings, command palette)
-  components/layout/       # Shared application layout components
-  components/ui/           # Reusable UI primitives
-  api/                     # Frontend Tauri API wrappers
-  lib/                     # Runtime and clipboard adapters
-  store/                   # Zustand state
-  styles/                  # Global theme, base, layout, and responsive styles
-  types/                   # Shared frontend types
-
-src-tauri/src/
-  lib.rs                   # Tauri setup, plugins, window events
-  db.rs                    # SQLite persistence and API key encryption
-  translate.rs             # OpenAI-compatible Responses / Chat Completions requests
-  shortcut.rs              # Global shortcut registration
-  window.rs                # Show/hide/focus commands
-```
-
-## License
-
-MIT. See [LICENSE](./LICENSE).
