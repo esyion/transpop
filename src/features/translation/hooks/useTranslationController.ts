@@ -1,0 +1,329 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+
+import {
+  clearAllHistory,
+  deleteHistoryItem,
+  loadRecentHistory,
+  MAX_HISTORY_ITEMS,
+  saveBrowserHistory,
+} from "@/api/settingsStore";
+import { translator } from "@/api/translator";
+import { writeClipboardText } from "@/lib/clipboard";
+import { hasTauriRuntime } from "@/lib/runtime";
+import { useAppStore } from "@/store/appStore";
+import type { HistoryItem, TranslationSettings } from "@/types/translation";
+import { getLanguageLabel } from "@/utils/constants";
+import { inferTargetLanguage } from "@/features/translation/utils/language";
+
+function createTranslationRequestKey(
+  text: string,
+  settings: TranslationSettings,
+  targetLanguage: string,
+): string {
+  return [
+    text,
+    settings.apiBaseUrl,
+    settings.apiMode,
+    settings.model,
+    targetLanguage,
+    settings.apiKeyConfigured,
+    settings.apiKey,
+  ].join("\u0000");
+}
+
+export function useTranslationController() {
+  const translateRequestIdRef = useRef(0);
+  const lastTranslatedKeyRef = useRef("");
+  const copyTimerRef = useRef<number | undefined>(undefined);
+  const [copied, setCopied] = useState(false);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const input = useAppStore((state) => state.input);
+  const result = useAppStore((state) => state.result);
+  const loading = useAppStore((state) => state.loading);
+  const error = useAppStore((state) => state.error);
+  const history = useAppStore((state) => state.history);
+  const settings = useAppStore((state) => state.settings);
+  const view = useAppStore((state) => state.view);
+  const setInput = useAppStore((state) => state.setInput);
+  const setLoading = useAppStore((state) => state.setLoading);
+  const setError = useAppStore((state) => state.setError);
+  const setResult = useAppStore((state) => state.setResult);
+  const clearResult = useAppStore((state) => state.clearResult);
+  const restoreHistoryItem = useAppStore((state) => state.useHistoryItem);
+  const setHistory = useAppStore((state) => state.setHistory);
+  const removeHistoryItemFromStore = useAppStore(
+    (state) => state.removeHistoryItem,
+  );
+  const clearHistoryFromStore = useAppStore((state) => state.clearHistory);
+
+  const effectiveTargetLanguage = useMemo(
+    () => inferTargetLanguage(input, settings),
+    [input, settings],
+  );
+  const apiKeyMissing =
+    !settings.apiKeyConfigured && settings.apiKey.trim().length === 0;
+  const languageHint = result
+    ? `${getLanguageLabel(String(result.sourceLanguage))} → ${getLanguageLabel(String(result.targetLanguage))}`
+    : `自动 → ${getLanguageLabel(effectiveTargetLanguage)}`;
+
+  const resetHistoryIndex = useCallback(() => setHistoryIndex(-1), []);
+
+  const markCopied = useCallback(() => {
+    setCopied(true);
+    if (copyTimerRef.current) window.clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = window.setTimeout(() => setCopied(false), 1600);
+  }, []);
+
+  const restoreHistoryWithoutTranslating = useCallback(
+    (item: HistoryItem) => {
+      const text = item.input.trim();
+      if (text) {
+        lastTranslatedKeyRef.current = createTranslationRequestKey(
+          text,
+          settings,
+          inferTargetLanguage(text, settings),
+        );
+      }
+
+      translateRequestIdRef.current += 1;
+      setLoading(false);
+      restoreHistoryItem(item);
+    },
+    [restoreHistoryItem, setLoading, settings],
+  );
+
+  const selectHistoryItem = useCallback(
+    (item: HistoryItem) => {
+      setHistoryIndex(
+        history.findIndex((historyItem) => historyItem.id === item.id),
+      );
+      restoreHistoryWithoutTranslating(item);
+    },
+    [history, restoreHistoryWithoutTranslating],
+  );
+
+  const removeHistoryItem = useCallback(
+    async (item: HistoryItem) => {
+      try {
+        await deleteHistoryItem(item.id);
+
+        setHistoryIndex((currentIndex) => {
+          if (currentIndex < 0) return currentIndex;
+          const removedIndex = history.findIndex(
+            (historyItem) => historyItem.id === item.id,
+          );
+          if (removedIndex < 0) return currentIndex;
+          if (removedIndex === currentIndex) return -1;
+          if (removedIndex < currentIndex) return currentIndex - 1;
+          return currentIndex;
+        });
+
+        try {
+          const loaded = await loadRecentHistory(MAX_HISTORY_ITEMS);
+          setHistory(loaded);
+        } catch {
+          removeHistoryItemFromStore(item.id);
+        }
+
+        toast.success("已删除历史记录");
+      } catch (cause) {
+        console.error(cause);
+        toast.error("删除历史记录失败");
+      }
+    },
+    [history, removeHistoryItemFromStore, setHistory],
+  );
+
+  const clearHistory = useCallback(async () => {
+    try {
+      await clearAllHistory();
+      clearHistoryFromStore();
+      setHistoryIndex(-1);
+      toast.success("已清空全部历史记录");
+    } catch (cause) {
+      console.error(cause);
+      toast.error("清空历史记录失败");
+    }
+  }, [clearHistoryFromStore]);
+
+  const refreshRecentHistory = useCallback(
+    async (fallbackHistory?: HistoryItem[]) => {
+      if (hasTauriRuntime()) {
+        try {
+          const loaded = await loadRecentHistory(MAX_HISTORY_ITEMS);
+          setHistory(loaded);
+        } catch {
+          console.warn("Failed to load recent history");
+          if (fallbackHistory) setHistory(fallbackHistory);
+        }
+        return;
+      }
+      if (fallbackHistory) {
+        saveBrowserHistory(fallbackHistory);
+        setHistory(fallbackHistory);
+      }
+    },
+    [setHistory],
+  );
+
+  const runTranslate = useCallback(
+    async (textOverride?: string, force = false) => {
+      const text = (textOverride ?? input).trim();
+      if (!text) return;
+
+      if (apiKeyMissing) {
+        setError(null);
+        if (force) toast.info("请先添加 API 密钥");
+        return;
+      }
+
+      const requestKey = createTranslationRequestKey(
+        text,
+        settings,
+        effectiveTargetLanguage,
+      );
+      if (!force && requestKey === lastTranslatedKeyRef.current) return;
+
+      const requestId = translateRequestIdRef.current + 1;
+      translateRequestIdRef.current = requestId;
+      lastTranslatedKeyRef.current = requestKey;
+      setLoading(true);
+      setError(null);
+      resetHistoryIndex();
+
+      try {
+        const nextResult = await translator.translate(
+          text,
+          settings,
+          effectiveTargetLanguage,
+        );
+        if (requestId !== translateRequestIdRef.current) return;
+
+        setResult(text, nextResult);
+
+        const nextHistoryItem: HistoryItem = {
+          id: crypto.randomUUID(),
+          input: text,
+          output: nextResult.result,
+          sourceLanguage: String(nextResult.sourceLanguage),
+          targetLanguage: String(nextResult.targetLanguage),
+          createdAt: Date.now(),
+        };
+
+        if (requestId !== translateRequestIdRef.current) return;
+
+        const nextHistory = [nextHistoryItem, ...history].slice(
+          0,
+          MAX_HISTORY_ITEMS,
+        );
+        await refreshRecentHistory(nextHistory);
+
+        if (requestId !== translateRequestIdRef.current) return;
+
+        if (settings.autoCopy) {
+          await writeClipboardText(nextResult.result);
+          markCopied();
+          toast.success("翻译结果已复制");
+        } else {
+          toast.success("翻译完成");
+        }
+      } catch (cause) {
+        if (requestId !== translateRequestIdRef.current) return;
+        console.error(cause);
+        const message = String(cause).includes("API key")
+          ? "请打开设置并添加 API 密钥"
+          : "无法完成翻译，请重试或检查网络连接";
+        setError(message);
+        toast.error(message);
+      } finally {
+        if (requestId === translateRequestIdRef.current) setLoading(false);
+      }
+    },
+    [
+      apiKeyMissing,
+      effectiveTargetLanguage,
+      history,
+      input,
+      markCopied,
+      refreshRecentHistory,
+      resetHistoryIndex,
+      setError,
+      setLoading,
+      setResult,
+      settings,
+    ],
+  );
+
+  useEffect(() => {
+    if (view !== "translate" || apiKeyMissing) return;
+    const text = input.trim();
+    if (!text) {
+      lastTranslatedKeyRef.current = "";
+      return;
+    }
+
+    const timerId = window.setTimeout(() => void runTranslate(text), 1000);
+    return () => window.clearTimeout(timerId);
+  }, [apiKeyMissing, input, runTranslate, view]);
+
+  const copyResult = useCallback(async () => {
+    if (!result?.result) return;
+    await writeClipboardText(result.result);
+    markCopied();
+    toast.success("已复制到剪贴板");
+  }, [markCopied, result?.result]);
+
+  const retry = useCallback(
+    () => void runTranslate(undefined, true),
+    [runTranslate],
+  );
+
+  const clearInput = useCallback(() => {
+    setInput("");
+    clearResult();
+    resetHistoryIndex();
+  }, [clearResult, resetHistoryIndex, setInput]);
+
+  const moveHistory = useCallback(
+    (direction: 1 | -1) => {
+      if (history.length === 0) return;
+      const nextIndex = Math.min(
+        Math.max(historyIndex + direction, 0),
+        history.length - 1,
+      );
+      setHistoryIndex(nextIndex);
+      restoreHistoryWithoutTranslating(history[nextIndex]);
+    },
+    [history, historyIndex, restoreHistoryWithoutTranslating],
+  );
+
+  return {
+    input,
+    result,
+    loading,
+    error,
+    history,
+    settings,
+    view,
+    copied,
+    historyIndex,
+    apiKeyMissing,
+    effectiveTargetLanguage,
+    languageHint,
+    setInput,
+    clearResult,
+    useHistoryItem: selectHistoryItem,
+    removeHistoryItem,
+    clearHistory,
+    runTranslate,
+    copyResult,
+    retry,
+    clearInput,
+    moveHistory,
+    resetHistoryIndex,
+  };
+}
