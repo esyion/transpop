@@ -10,7 +10,7 @@
   ],
   "permissions": [
     "updater:default",
-    "process:default",
+    "process:allow-restart",
     "autostart:allow-enable",
     "autostart:allow-disable",
     "autostart:allow-is-enabled"

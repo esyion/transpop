@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { TranslationView } from "@/components/translation-view";
+import { TranslationView } from "@/features/translation";
 
 export const metadata: Metadata = {
   title: "TransPop",
