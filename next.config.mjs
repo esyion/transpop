@@ -4,10 +4,6 @@ const nextConfig = {
   trailingSlash: false,
   images: { unoptimized: true },
   reactStrictMode: true,
-  devIndicators: {
-    appIsrStatus: false,
-    buildActivity: false,
-  },
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },

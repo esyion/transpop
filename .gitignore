@@ -33,3 +33,4 @@ dist
 
 # Next.js
 next-env.d.ts
+*.tsbuildinfo
