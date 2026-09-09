@@ -1,6 +1,6 @@
 [package]
 name = "transpop"
-version = "0.2.10"
+version = "0.2.11"
 description = "TransPop - a lightweight desktop translation tool"
 authors = ["esyion"]
 edition = "2021"
