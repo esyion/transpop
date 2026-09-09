@@ -148,7 +148,7 @@ export function parseArgs(argv) {
     releaseArg: null,
     build: true,
     tauriBuild: false,
-    push: false,
+    push: true,
     dryRun: false,
     yes: false,
     help: false,
