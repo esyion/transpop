@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: TranslationSettings = {
   apiKeyConfigured: false,
   targetLanguage: "Chinese",
   smartTargetLanguage: true,
-  shortcut: "Alt + Space",
+  shortcut: "Alt + `",
   shortcutEnabled: true,
   theme: "system",
   fontScale: 1,

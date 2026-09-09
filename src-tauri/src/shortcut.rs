@@ -3,7 +3,11 @@ use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
 
 use crate::{db, window};
 
-const FALLBACK_SHORTCUT: &str = "alt+space";
+const FALLBACK_SHORTCUT: &str = if cfg!(target_os = "macos") {
+    "command+`"
+} else {
+    "alt+`"
+};
 
 fn normalize_shortcut(shortcut: &str) -> String {
     shortcut

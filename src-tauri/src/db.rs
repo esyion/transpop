@@ -14,6 +14,16 @@ const DB_FILE_NAME: &str = "transpop.sqlite3";
 const KEYRING_SERVICE: &str = "TransPop";
 const KEYRING_USER: &str = "sqlite-api-key-encryption";
 
+/// 全局快捷键的平台默认值：macOS 用 Cmd + `，其余平台用 Alt + `。
+/// 旧版默认的 Alt + Space 在 Windows 上被系统菜单占用，无法注册。
+pub fn default_shortcut() -> &'static str {
+    if cfg!(target_os = "macos") {
+        "Command + `"
+    } else {
+        "Alt + `"
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
@@ -53,7 +63,7 @@ impl Default for AppSettings {
             model: "gpt-5.4".to_string(),
             target_language: "Chinese".to_string(),
             smart_target_language: true,
-            shortcut: "Alt + Space".to_string(),
+            shortcut: default_shortcut().to_string(),
             shortcut_enabled: true,
             theme: "system".to_string(),
             font_scale: 1.0,
@@ -235,7 +245,7 @@ fn db_path<R: Runtime>(app: &AppHandle<R>) -> Result<PathBuf, String> {
 }
 
 fn migrate(conn: &Connection) -> Result<(), String> {
-    conn.execute_batch(
+    let schema = format!(
         "PRAGMA foreign_keys = ON;
          CREATE TABLE IF NOT EXISTS app_settings (
            id INTEGER PRIMARY KEY CHECK (id = 1),
@@ -244,7 +254,7 @@ fn migrate(conn: &Connection) -> Result<(), String> {
            model TEXT NOT NULL DEFAULT 'gpt-5.4',
            target_language TEXT NOT NULL DEFAULT 'Chinese',
            smart_target_language INTEGER NOT NULL DEFAULT 1,
-           shortcut TEXT NOT NULL DEFAULT 'Alt + Space',
+           shortcut TEXT NOT NULL DEFAULT '{default_shortcut}',
            shortcut_enabled INTEGER NOT NULL DEFAULT 1,
            theme TEXT NOT NULL DEFAULT 'system',
            font_scale REAL NOT NULL DEFAULT 1.0,
@@ -264,8 +274,10 @@ fn migrate(conn: &Connection) -> Result<(), String> {
            created_at INTEGER NOT NULL
          );
          CREATE INDEX IF NOT EXISTS idx_translation_history_created_at ON translation_history(created_at DESC);",
-    )
-    .map_err(|err| err.to_string())?;
+        default_shortcut = default_shortcut()
+    );
+    conn.execute_batch(&schema)
+        .map_err(|err| err.to_string())?;
 
     ensure_column(conn, "app_settings", "api_base_url", "TEXT NOT NULL DEFAULT 'https://api.openai.com/v1'")?;
     ensure_column(conn, "app_settings", "api_mode", "TEXT NOT NULL DEFAULT 'responses'")?;
@@ -275,6 +287,13 @@ fn migrate(conn: &Connection) -> Result<(), String> {
     ensure_column(conn, "app_settings", "auto_copy", "INTEGER NOT NULL DEFAULT 1")?;
     ensure_column(conn, "app_settings", "api_key_ciphertext", "TEXT")?;
     ensure_column(conn, "app_settings", "api_key_nonce", "TEXT")?;
+
+    // 旧版默认的 Alt + Space 在 Windows 上被系统菜单占用、无法注册，迁移到平台默认快捷键
+    conn.execute(
+        "UPDATE app_settings SET shortcut = ?1 WHERE shortcut = 'Alt + Space'",
+        params![default_shortcut()],
+    )
+    .map_err(|err| err.to_string())?;
 
     Ok(())
 }

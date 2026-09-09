@@ -299,7 +299,8 @@ function ShortcutGroup({ shortcutError }: { shortcutError: string | null }) {
       event.ctrlKey ? "Ctrl" : null,
       event.altKey ? "Alt" : null,
       event.shiftKey ? "Shift" : null,
-      event.metaKey ? "Meta" : null,
+      // 后端只识别 COMMAND，不识别 META
+      event.metaKey ? "Command" : null,
       key,
     ].filter(Boolean) as string[];
 
@@ -330,7 +331,7 @@ function ShortcutGroup({ shortcutError }: { shortcutError: string | null }) {
               id="shortcut"
               value={recording ? "请按下快捷键…" : settings.shortcut}
               readOnly
-              placeholder="Alt + Space"
+              placeholder="Alt + `"
               name="shortcut"
               autoComplete="off"
             />
